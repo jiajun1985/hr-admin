@@ -10,6 +10,7 @@ import { Select } from '../components/basics/Select';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedDepartments, seedEmployees } from '../mockApi/demoData';
+import type { Employee } from '../mockApi/types';
 import * as XLSX from 'xlsx';
 
 interface Department {
@@ -21,25 +22,6 @@ interface Department {
   employeeCount: number;
   createTime: string;
   children?: Department[];
-}
-
-interface Employee {
-  id: string;
-  empNo: string;
-  name: string;
-  position: string;
-  gender: string;
-  phone: string;
-  email?: string;
-  idCard?: string;
-  birthday?: string;
-  education?: string;
-  graduateSchool?: string;
-  entryDate: string;
-  status: 'active' | 'inactive';
-  activationStatus: boolean;
-  department: string;
-  leaveDate?: string;
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -85,6 +67,14 @@ function getChildIds(nodes: Department[], parentId: string): string[] {
   };
   parent.children?.forEach(collectIds);
   return ids;
+}
+
+function collectDepartmentNames(node: Department): string[] {
+  const names = [node.name];
+  node.children?.forEach((child) => {
+    names.push(...collectDepartmentNames(child));
+  });
+  return names;
 }
 
 function addNode(nodes: Department[], parentId: string, newNode: Department): Department[] {
@@ -146,6 +136,13 @@ function getDepartmentEmployeeCountMap(nodes: Department[], employees: Employee[
   const map: Record<string, number> = {};
 
   const walk = (node: Department): number => {
+    if (node.id === '1') {
+      const total = employees.length;
+      map[node.id] = total;
+      node.children?.forEach((child) => walk(child));
+      return total;
+    }
+
     const directCount = employees.filter((emp) => emp.department === node.name).length;
     const childCount = node.children?.reduce((sum, child) => sum + walk(child), 0) ?? 0;
     const total = directCount + childCount;
@@ -167,6 +164,10 @@ function getEmploymentStatusMeta(employee: Employee, currentDate: string) {
   }
 
   return { label: '在职', color: 'success' as const };
+}
+
+function isVisibleDepartmentEmployee(employee: Employee, currentDate: string) {
+  return getEmploymentStatusMeta(employee, currentDate).label !== '已离职';
 }
 
 interface TreeNodeProps {
@@ -289,7 +290,10 @@ const DepartmentPage: React.FC = () => {
   const [assignEmployeeIds, setAssignEmployeeIds] = useState<string[]>([]);
   const [assignSearch, setAssignSearch] = useState('');
   const [transferEmployeeId, setTransferEmployeeId] = useState<string>('');
-  const departmentCountMap = useMemo(() => getDepartmentEmployeeCountMap(departments, employees), [departments, employees]);
+  const departmentCountMap = useMemo(
+    () => getDepartmentEmployeeCountMap(departments, employees.filter((employee) => isVisibleDepartmentEmployee(employee, currentDate))),
+    [departments, employees, currentDate]
+  );
 
   React.useEffect(() => {
     if (departments.length > 0 && !selectedDepartment) {
@@ -318,9 +322,9 @@ const DepartmentPage: React.FC = () => {
   const unassignedEmployees = useMemo(() => {
     return employees.filter((e) => {
       const deptExists = flatDepartments.some((d) => d.name === e.department);
-      return !deptExists || e.department === '未分配';
+      return (!deptExists || e.department === '未分配') && isVisibleDepartmentEmployee(e, currentDate);
     });
-  }, [employees, flatDepartments]);
+  }, [employees, flatDepartments, currentDate]);
   const filteredAssignableEmployees = useMemo(() => {
     if (!assignSearch.trim()) return unassignedEmployees;
     return unassignedEmployees.filter((emp) => (
@@ -441,9 +445,13 @@ const DepartmentPage: React.FC = () => {
 
   const doDeleteDept = () => {
     if (!selectedDepartment) return;
-    const deptName = selectedDepartment.name;
+    const deptNames = new Set(collectDepartmentNames(selectedDepartment));
     setDepartments((prev) => deleteNode(prev, selectedDepartment.id));
-    setEmployees((prev) => prev.filter((e) => e.department !== deptName));
+    setEmployees((prev) => prev.map((employee) => (
+      deptNames.has(employee.department)
+        ? { ...employee, department: '未分配' }
+        : employee
+    )));
     setDeleteDeptOpen(false);
     setDepartments((currentDepts) => {
       const parent = findParent(currentDepts, selectedDepartment.id);
@@ -579,10 +587,10 @@ const DepartmentPage: React.FC = () => {
   const deptEmployees = useMemo(() => {
     if (!selectedDepartment) return [];
     if (selectedDepartment.id === '1') {
-      return employees;
+      return employees.filter((employee) => isVisibleDepartmentEmployee(employee, currentDate));
     }
-    return employees.filter((e) => e.department === selectedDepartment.name);
-  }, [employees, selectedDepartment]);
+    return employees.filter((e) => e.department === selectedDepartment.name && isVisibleDepartmentEmployee(e, currentDate));
+  }, [employees, selectedDepartment, currentDate]);
 
   const filteredEmployees = useMemo(() => {
     return deptEmployees.filter((emp) => {
