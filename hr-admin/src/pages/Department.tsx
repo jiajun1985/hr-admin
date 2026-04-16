@@ -10,6 +10,7 @@ import { Select } from '../components/basics/Select';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedDepartments, seedEmployees } from '../mockApi/demoData';
+import * as XLSX from 'xlsx';
 
 interface Department {
   id: string;
@@ -283,11 +284,11 @@ const DepartmentPage: React.FC = () => {
   const [managerConfirmOpen, setManagerConfirmOpen] = useState(false);
   const [pendingManager, setPendingManager] = useState<Employee | null>(null);
   const [batchAssignOpen, setBatchAssignOpen] = useState(false);
-  const [batchAssignDept, setBatchAssignDept] = useState<string>('');
   const [assignDeptOpen, setAssignDeptOpen] = useState(false);
   const [assignTargetDeptId, setAssignTargetDeptId] = useState<string>('');
   const [assignEmployeeIds, setAssignEmployeeIds] = useState<string[]>([]);
   const [assignSearch, setAssignSearch] = useState('');
+  const [transferEmployeeId, setTransferEmployeeId] = useState<string>('');
   const departmentCountMap = useMemo(() => getDepartmentEmployeeCountMap(departments, employees), [departments, employees]);
 
   React.useEffect(() => {
@@ -329,6 +330,17 @@ const DepartmentPage: React.FC = () => {
       emp.position.includes(assignSearch)
     ));
   }, [assignSearch, unassignedEmployees]);
+  const assignableUnassignedEmployees = useMemo(() => {
+    return unassignedEmployees.filter((emp) => getEmploymentStatusMeta(emp, currentDate).label === '在职');
+  }, [currentDate, unassignedEmployees]);
+  const transferEmployee = useMemo(
+    () => employees.find((emp) => emp.id === transferEmployeeId) || null,
+    [employees, transferEmployeeId]
+  );
+  const transferDeptOptions = useMemo(() => {
+    if (!transferEmployee) return assignDeptOptions;
+    return assignDeptOptions.filter((opt) => opt.label !== transferEmployee.department);
+  }, [assignDeptOptions, transferEmployee]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -447,11 +459,22 @@ const DepartmentPage: React.FC = () => {
     setManagerConfirmOpen(true);
   };
 
+  const openTransferDept = (emp: Employee) => {
+    const statusMeta = getEmploymentStatusMeta(emp, currentDate);
+    if (statusMeta.label !== '在职') {
+      showToast('待离职或已离职员工不能调整部门');
+      return;
+    }
+    setTransferEmployeeId(emp.id);
+    setTransferTargetId('');
+    setTransferModalOpen(true);
+  };
+
   const confirmSetManager = () => {
     if (!selectedDepartment || !pendingManager) return;
     const pendingStatus = getEmploymentStatusMeta(pendingManager, currentDate);
     if (pendingManager.department === '未分配' || pendingStatus.label !== '在职') {
-      showToast('已离职员工不能设为负责人');
+      showToast('未分配、待离职或已离职员工不能设为负责人');
       setManagerConfirmOpen(false);
       setPendingManager(null);
       return;
@@ -464,30 +487,6 @@ const DepartmentPage: React.FC = () => {
     setManagerConfirmOpen(false);
     showToast(`已设置「${pendingManager.name}」为负责人`);
     setPendingManager(null);
-  };
-
-  const handleBatchAssign = () => {
-    if (!batchAssignDept) return;
-    const targetDept = flatDepartments.find((d) => d.id === batchAssignDept);
-    if (!targetDept) return;
-
-    if (unassignedEmployees.length === 0) {
-      showToast('没有需要分配的员工');
-      setBatchAssignOpen(false);
-      return;
-    }
-
-    setEmployees((prev) => prev.map((e) => {
-      const shouldAssign = unassignedEmployees.some((emp) => emp.id === e.id);
-      if (shouldAssign) {
-        return { ...e, department: targetDept.name };
-      }
-      return e;
-    }));
-
-    setBatchAssignOpen(false);
-    showToast(`已将 ${unassignedEmployees.length} 名员工分配至「${targetDept.name}」`);
-    setBatchAssignDept('');
   };
 
   const unassignedCount = unassignedEmployees.length;
@@ -527,6 +526,56 @@ const DepartmentPage: React.FC = () => {
     showToast(`已将 ${assignedCount} 名员工分配至「${targetDept.name}」`);
   };
 
+  const handleTransferDept = () => {
+    if (!transferEmployee || !transferTargetId) return;
+    const targetDept = flatDepartments.find((d) => d.id === transferTargetId);
+    if (!targetDept) return;
+
+    if (transferEmployee.department === targetDept.name) {
+      showToast('目标部门与当前部门相同');
+      return;
+    }
+
+    const oldDept = transferEmployee.department;
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        emp.id === transferEmployee.id ? { ...emp, department: targetDept.name } : emp
+      )
+    );
+    if (oldDept && oldDept !== '未分配') {
+      setDepartments((prev) => updateNodeEmployeeCount(prev, oldDept, -1));
+    }
+    setDepartments((prev) => updateNodeEmployeeCount(prev, targetDept.name, 1));
+    setTransferModalOpen(false);
+    setTransferEmployeeId('');
+    setTransferTargetId('');
+    showToast(`已将「${transferEmployee.name}」调整至「${targetDept.name}」`);
+  };
+
+  const downloadAssignTemplate = () => {
+    const header = ['工号', '姓名', '证件号', '部门名称'];
+    const rows = unassignedEmployees.map((emp) => ([
+      emp.empNo || '',
+      emp.name || '',
+      emp.idCard || '—',
+      '',
+    ]));
+    const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
+    worksheet['!cols'] = [{ wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 20 }];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '未分配员工');
+    const binary = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([binary], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = '未分配员工部门填写模板.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const deptEmployees = useMemo(() => {
     if (!selectedDepartment) return [];
     if (selectedDepartment.id === '1') {
@@ -545,6 +594,20 @@ const DepartmentPage: React.FC = () => {
       );
     });
   }, [deptEmployees, memberSearch]);
+
+  const sortedEmployees = useMemo(() => {
+    if (!selectedDepartment || !selectedDepartment.manager || selectedDepartment.manager === '-') {
+      return filteredEmployees;
+    }
+
+    const managerName = selectedDepartment.manager;
+    return [...filteredEmployees].sort((a, b) => {
+      const aIsManager = a.name === managerName;
+      const bIsManager = b.name === managerName;
+      if (aIsManager === bIsManager) return 0;
+      return aIsManager ? -1 : 1;
+    });
+  }, [filteredEmployees, selectedDepartment]);
 
   const employeeColumns = useMemo<TableColumn<Employee>[]>(() => [
     {
@@ -614,6 +677,13 @@ const DepartmentPage: React.FC = () => {
     if (!selectedDepartment) return [];
     return [
       {
+        key: 'transfer',
+        label: '调整部门',
+        type: 'default' as const,
+        onClick: openTransferDept,
+        hidden: (record: Employee) => getEmploymentStatusMeta(record, currentDate).label !== '在职',
+      },
+      {
         key: 'manager',
         label: '设为负责人',
         type: 'primary' as const,
@@ -624,16 +694,11 @@ const DepartmentPage: React.FC = () => {
         },
       },
     ];
-  }, [currentDate, selectedDepartment]);
+  }, [currentDate, openTransferDept, handleSetManager, selectedDepartment]);
 
   const searchResults = searchValue
     ? flatDepartments.filter((d) => d.name.includes(searchValue))
     : [];
-
-  const transferOptions = useMemo(() => {
-    if (!selectedDepartment) return deptOptions;
-    return deptOptions.filter((opt) => opt.value !== selectedDepartment.id);
-  }, [deptOptions, selectedDepartment]);
 
   return (
     <div>
@@ -718,18 +783,8 @@ const DepartmentPage: React.FC = () => {
                 <div>
                   <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--gray-800)', marginBottom: '12px' }}>{selectedDepartment.name}</h3>
                   <div style={{ display: 'flex', gap: '24px', fontSize: '13px', color: 'var(--gray-500)' }}>
-                    <span>
-                      <Icon name="user" size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      负责人：{selectedDepartment.manager}
-                    </span>
-                    <span>
-                      <Icon name="phone" size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      {selectedDepartment.managerPhone}
-                    </span>
-                    <span>
-                      <Icon name="calendar" size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      创建时间：{selectedDepartment.createTime}
-                    </span>
+                    <span>负责人：{selectedDepartment.manager}</span>
+                    <span>部门人数：{departmentCountMap[selectedDepartment.id] ?? 0}</span>
                   </div>
                 </div>
                 {selectedDepartment.id !== '1' && (
@@ -761,7 +816,7 @@ const DepartmentPage: React.FC = () => {
                 </div>
                 <DataTable
                   columns={employeeColumns}
-                  dataSource={filteredEmployees}
+                  dataSource={sortedEmployees}
                   rowKey="id"
                   layoutMode="content"
                   rowActions={selectedDepartment ? employeeRowActions : undefined}
@@ -856,7 +911,7 @@ const DepartmentPage: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: selectedDepartment?.id === '1' ? '1fr 1.2fr' : '1fr', gap: '16px' }}>
           <div>
             <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: 'var(--info-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--info-600)' }}>
-              当前可分配员工：<strong>{unassignedCount}</strong> 人
+              当前未分配员工：<strong>{unassignedCount}</strong> 人，当前可分配：<strong>{assignableUnassignedEmployees.length}</strong> 人
             </div>
             {selectedDepartment?.id === '1' ? (
               <div>
@@ -891,6 +946,10 @@ const DepartmentPage: React.FC = () => {
                 </div>
               ) : (
                 filteredAssignableEmployees.map((emp) => (
+                  (() => {
+                    const statusMeta = getEmploymentStatusMeta(emp, currentDate);
+                    const isSelectable = statusMeta.label === '在职';
+                    return (
                   <label
                     key={emp.id}
                     style={{
@@ -900,7 +959,8 @@ const DepartmentPage: React.FC = () => {
                       gap: '12px',
                       padding: '10px 12px',
                       borderBottom: '1px solid var(--gray-100)',
-                      cursor: 'pointer',
+                      cursor: isSelectable ? 'pointer' : 'not-allowed',
+                      opacity: isSelectable ? 1 : 0.6,
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--gray-50)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
@@ -909,7 +969,9 @@ const DepartmentPage: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={assignEmployeeIds.includes(emp.id)}
+                        disabled={!isSelectable}
                         onChange={(e) => {
+                          if (!isSelectable) return;
                           setAssignEmployeeIds((prev) => (
                             e.target.checked
                               ? [...prev, emp.id]
@@ -922,12 +984,56 @@ const DepartmentPage: React.FC = () => {
                         <div style={{ fontSize: '12px', color: 'var(--gray-500)' }}>{emp.empNo} · {emp.position} · {emp.department || '未分配'}</div>
                       </div>
                     </div>
-                    <Tag color="warning" style={{ whiteSpace: 'nowrap' }}>待分配</Tag>
+                    <Tag color={isSelectable ? 'warning' : 'default'} style={{ whiteSpace: 'nowrap' }}>
+                      {isSelectable ? '待分配' : statusMeta.label}
+                    </Tag>
                   </label>
+                    );
+                  })()
                 ))
               )}
             </div>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        open={transferModalOpen}
+        onClose={() => {
+          setTransferModalOpen(false);
+          setTransferEmployeeId('');
+          setTransferTargetId('');
+        }}
+        title="调整部门"
+        size="sm"
+        footer={[
+          <Button
+            key="cancel"
+            type="secondary"
+            onClick={() => {
+              setTransferModalOpen(false);
+              setTransferEmployeeId('');
+              setTransferTargetId('');
+            }}
+          >
+            取消
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleTransferDept} disabled={!transferTargetId}>
+            确认调整
+          </Button>,
+        ]}
+      >
+        <div>
+          <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: 'var(--gray-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--gray-700)' }}>
+            {transferEmployee ? `${transferEmployee.name} · ${transferEmployee.empNo} · ${transferEmployee.department}` : '请选择要调整的员工'}
+          </div>
+          <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>目标部门</label>
+          <Select
+            options={transferDeptOptions}
+            placeholder="请选择目标部门"
+            value={transferTargetId}
+            onChange={(v) => setTransferTargetId(String(v))}
+          />
         </div>
       </Modal>
 
@@ -956,21 +1062,24 @@ const DepartmentPage: React.FC = () => {
 
       <Modal
         open={batchAssignOpen}
-        onClose={() => { setBatchAssignOpen(false); setBatchAssignDept(''); }}
+        onClose={() => { setBatchAssignOpen(false); }}
         title="批量分配部门"
         size="md"
         footer={[
-          <Button key="cancel" type="secondary" onClick={() => { setBatchAssignOpen(false); setBatchAssignDept(''); }}>取消</Button>,
-          <Button key="submit" type="primary" onClick={handleBatchAssign} disabled={!batchAssignDept}>确认分配</Button>,
+          <Button key="cancel" type="secondary" onClick={() => { setBatchAssignOpen(false); }}>取消</Button>,
+          <Button key="submit" type="primary" onClick={() => setBatchAssignOpen(false)}>关闭</Button>,
         ]}
       >
         <div>
           <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: 'var(--info-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--info-600)' }}>
-            当前有 <strong>{unassignedCount}</strong> 名员工尚未分配部门，可通过上传Excel文件批量分配，或直接选择目标部门进行分配。
+            当前有 <strong>{unassignedCount}</strong> 名员工尚未分配部门，下载模板后只需填写部门名称即可。
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>上传Excel文件</label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', color: 'var(--gray-600)', display: 'block' }}>上传Excel文件</label>
+              <Button size="sm" type="secondary" icon="download" onClick={downloadAssignTemplate}>下载模板</Button>
+            </div>
             <div style={{ border: '2px dashed var(--gray-200)', borderRadius: 'var(--radius-sm)', padding: '24px', textAlign: 'center' }}>
               <Icon name="upload" size={32} color="var(--gray-300)" />
               <div style={{ marginTop: '8px', fontSize: '13px', color: 'var(--gray-500)' }}>
@@ -981,18 +1090,12 @@ const DepartmentPage: React.FC = () => {
               </div>
             </div>
             <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--gray-400)' }}>
-              Excel模板：工号、姓名、目标部门（必填）
+              模板表头：工号、姓名、证件号、部门名称
+              <br />
+              下载文件里已带出未分配员工明细，只需填写“部门名称”。
+              <br />
+              部门名称写法示例：总公司/研发部/运维组
             </div>
-          </div>
-
-          <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>或直接选择目标部门</label>
-            <Select
-              options={deptOptions.filter((opt) => opt.value !== '1')}
-              placeholder="请选择目标部门"
-              value={batchAssignDept}
-              onChange={(v) => setBatchAssignDept(String(v))}
-            />
           </div>
         </div>
       </Modal>
