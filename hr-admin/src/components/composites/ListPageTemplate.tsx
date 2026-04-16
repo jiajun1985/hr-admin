@@ -61,6 +61,8 @@ interface ListPageTemplateProps<T> {
   };
   loading?: boolean;
   emptyText?: string;
+  tableLayoutMode?: 'fixed' | 'content';
+  hideFilterLabels?: boolean;
   onSearch?: (value: string) => void;
   onFilterChange?: (key: string, value: string | number | (string | number)[]) => void;
   onReset?: () => void;
@@ -84,6 +86,8 @@ export function ListPageTemplate<T extends Record<string, any>>({
   pagination,
   loading = false,
   emptyText = '暂无数据',
+  tableLayoutMode = 'fixed',
+  hideFilterLabels = false,
   onSearch,
   onFilterChange,
   onReset,
@@ -151,12 +155,12 @@ export function ListPageTemplate<T extends Record<string, any>>({
       )}
 
       {batchActions.length > 0 && (
-        <BatchActionBar
-          selectedCount={selectedRowKeys.length}
-          actions={batchActions}
-          onClear={() => handleSelectionChange([], [])}
-          selectedItems={selectedItems}
-        />
+      <BatchActionBar
+        selectedCount={selectedRowKeys.length}
+        actions={batchActions}
+        onClear={() => handleSelectionChange([], [])}
+        selectedItems={selectedItems}
+      />
       )}
 
       <FilterBar
@@ -165,6 +169,7 @@ export function ListPageTemplate<T extends Record<string, any>>({
         filterValues={filterValues}
         onFilterChange={handleFilterChange}
         onReset={handleReset}
+        hideLabels={hideFilterLabels}
         onSearch={(value) => {
           setSearchValue(value);
           onSearch?.(value);
@@ -175,6 +180,7 @@ export function ListPageTemplate<T extends Record<string, any>>({
         columns={columns}
         dataSource={dataSource}
         rowKey={rowKey}
+        layoutMode={tableLayoutMode}
         rowSelection={rowSelection ? {
           selectedRowKeys,
           onChange: handleSelectionChange,

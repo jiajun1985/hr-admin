@@ -10,6 +10,7 @@ export interface Employee {
   gender: string;
   phone: string;
   email?: string;
+  idType?: string;
   idCard?: string;
   birthday?: string;
   education?: string;
@@ -17,6 +18,7 @@ export interface Employee {
   status: 'active' | 'inactive';
   activationStatus: boolean;
   entryDate: string;
+  leaveDate?: string;
 }
 
 export interface Department {
@@ -120,11 +122,18 @@ export interface PointsRecord {
   id: string;
   name: string;
   empNo: string;
-  buttonType: 'grant' | 'deduct' | 'expire';
+  recordType: 'grant' | 'deduct' | 'expire';
   points: number;
   reason: string;
   operator: string;
   createTime: string;
+}
+
+export interface InsuranceMaterial {
+  id: string;
+  name: string;
+  type: string;
+  uploadDate: string;
 }
 
 export interface BirthdayEmployee {
@@ -210,6 +219,7 @@ export interface Role {
   userCount: number;
   permissions: string[];
   createTime: string;
+  status?: 'active' | 'inactive';
 }
 
 export interface Permission {

@@ -8,8 +8,8 @@ import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
 import { useNavigation } from '../contexts/NavigationContext';
-import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedMessages } from '../mockApi/demoData';
 
 interface Message {
   id: string;
@@ -21,23 +21,12 @@ interface Message {
   relatedLink?: string;
 }
 
-const mockMessages: Message[] = [
-  { id: '1', type: 'system', title: '系统升级通知', content: '福利平台将于4月20日凌晨2:00-6:00进行系统升级，届时部分功能将暂停使用。', createTime: '2024-04-15 10:00', isRead: false, relatedLink: '/system/notice/1' },
-  { id: '2', type: 'welfare', title: '您的积分已到账', content: '恭喜！您获得了1000积分，来源：春节福利发放。积分有效期至2024年12月31日。', createTime: '2024-04-14 09:30', isRead: false, relatedLink: '/points/detail' },
-  { id: '3', type: 'activity', title: '员工健康讲座邀请', content: '公司将于4月25日14:00举办"职场健康"主题讲座，报名截止4月22日，点击查看详情。', createTime: '2024-04-13 16:00', isRead: true, relatedLink: '/activity/123' },
-  { id: '4', type: 'reminder', title: '保险理赔待处理', content: '您有一笔保险理赔申请（单号：CL-2024-0412-001）待补充材料，请尽快处理。', createTime: '2024-04-12 11:00', isRead: true, relatedLink: '/claim/123' },
-  { id: '5', type: 'system', title: '账号安全提醒', content: '检测到您的账号在异地登录，如非本人操作，请及时修改密码。', createTime: '2024-04-11 20:00', isRead: true },
-  { id: '6', type: 'welfare', title: '端午节礼品领取提醒', content: '您的端午礼品已准备就绪，请于6月5日前到HR部门领取。', createTime: '2024-04-10 10:00', isRead: true, relatedLink: '/gift/ DragonBoat' },
-  { id: '7', type: 'activity', title: '生日祝福', content: '祝您生日快乐！本月寿星们将于周五下午参加集体生日会，期待您的参与！', createTime: '2024-04-08 08:00', isRead: true },
-  { id: '8', type: 'reminder', title: '体检报告可查询', content: '您的2024年度体检报告已生成，可点击查看详细报告内容。', createTime: '2024-04-05 14:00', isRead: true, relatedLink: '/medical/report/2024' },
-];
-
 type TabKey = 'all' | 'unread' | 'system' | 'welfare' | 'activity';
 
 const MessageCenter: React.FC = () => {
   const [messages, setMessages] = useLocalStorageState<Message[]>(
     DEMO_STORAGE_KEYS.messages,
-    mockMessages
+    seedMessages
   );
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [detailModalOpen, setDetailModalOpen] = useState(false);

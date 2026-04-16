@@ -8,6 +8,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   status?: InputStatus;
   errorMessage?: string;
   size?: 'sm' | 'md' | 'lg';
+  contentColor?: string;
 }
 
 const sizeStyles = {
@@ -22,6 +23,7 @@ export const Input: React.FC<InputProps> = ({
   status = 'default',
   errorMessage,
   size = 'md',
+  contentColor,
   style,
   disabled,
   ...props
@@ -63,7 +65,7 @@ export const Input: React.FC<InputProps> = ({
     outline: 'none',
     backgroundColor: 'transparent',
     fontSize: sizeStyles[size].fontSize,
-    color: 'var(--gray-800)',
+    color: contentColor || 'var(--gray-800)',
     ...(disabled ? { cursor: 'not-allowed', color: 'var(--gray-400)' } : {}),
   };
 

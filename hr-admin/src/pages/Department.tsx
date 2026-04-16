@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../components/composites/PageHeader';
+import { DataTable, type TableColumn } from '../components/composites/DataTable';
 import { Button } from '../components/basics/Button';
 import { Input } from '../components/basics/Input';
 import { Modal } from '../components/basics/Modal';
 import { Tag } from '../components/basics/Tag';
 import { Icon } from '../components/basics/Icon';
-import { Pagination } from '../components/basics/Pagination';
 import { Select } from '../components/basics/Select';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedDepartments, seedEmployees } from '../mockApi/demoData';
 
 interface Department {
   id: string;
@@ -26,69 +27,21 @@ interface Employee {
   empNo: string;
   name: string;
   position: string;
+  gender: string;
   phone: string;
+  email?: string;
+  idCard?: string;
+  birthday?: string;
+  education?: string;
+  graduateSchool?: string;
   entryDate: string;
   status: 'active' | 'inactive';
+  activationStatus: boolean;
   department: string;
+  leaveDate?: string;
 }
 
-const mockDepartments: Department[] = [
-  {
-    id: '1',
-    name: '总公司',
-    parentId: null,
-    manager: '张伟',
-    managerPhone: '138****8001',
-    employeeCount: 24,
-    createTime: '2018-01-01',
-    children: [
-      {
-        id: '1-1',
-        name: '研发部',
-        parentId: '1',
-        manager: '陈明',
-        managerPhone: '135****8005',
-        employeeCount: 9,
-        createTime: '2018-03-15',
-        children: [
-          { id: '1-1-1', name: '运维组', parentId: '1-1', manager: '孙浩', managerPhone: '133****8007', employeeCount: 1, createTime: '2019-08-15' },
-          { id: '1-1-2', name: '产品组', parentId: '1-1', manager: '黄磊', managerPhone: '125****8015', employeeCount: 1, createTime: '2019-05-28' },
-        ],
-      },
-      { id: '1-2', name: '市场部', parentId: '1', manager: '郑丽', managerPhone: '130****8010', employeeCount: 3, createTime: '2018-05-20' },
-      { id: '1-3', name: '销售部', parentId: '1', manager: '马超', managerPhone: '129****8011', employeeCount: 3, createTime: '2018-06-10' },
-      { id: '1-4', name: '人事部', parentId: '1', manager: '刘芳', managerPhone: '136****8004', employeeCount: 3, createTime: '2018-07-01' },
-      { id: '1-5', name: '财务部', parentId: '1', manager: '赵敏', managerPhone: '134****8006', employeeCount: 2, createTime: '2018-08-15' },
-    ],
-  },
-];
-
-const mockEmployees: Employee[] = [
-  { id: '1', empNo: 'EMP001', name: '张伟', position: '技术总监', phone: '138****8001', entryDate: '2018-03-15', status: 'active', department: '研发部' },
-  { id: '2', empNo: 'EMP002', name: '李娜', position: '市场总监', phone: '139****8002', entryDate: '2019-01-20', status: 'active', department: '市场部' },
-  { id: '3', empNo: 'EMP003', name: '王强', position: '销售总监', phone: '137****8003', entryDate: '2018-06-10', status: 'active', department: '销售部' },
-  { id: '4', empNo: 'EMP004', name: '刘芳', position: '人事总监', phone: '136****8004', entryDate: '2018-02-01', status: 'active', department: '人事部' },
-  { id: '5', empNo: 'EMP005', name: '陈明', position: '高级前端工程师', phone: '135****8005', entryDate: '2020-07-08', status: 'active', department: '研发部' },
-  { id: '6', empNo: 'EMP006', name: '赵敏', position: '财务总监', phone: '134****8006', entryDate: '2018-04-20', status: 'active', department: '财务部' },
-  { id: '7', empNo: 'EMP007', name: '孙浩', position: '运维主管', phone: '133****8007', entryDate: '2019-08-15', status: 'active', department: '研发部' },
-  { id: '8', empNo: 'EMP008', name: '周婷', position: '产品总监', phone: '132****8008', entryDate: '2019-05-28', status: 'active', department: '研发部' },
-  { id: '9', empNo: 'EMP009', name: '吴昊', position: 'Java开发工程师', phone: '131****8009', entryDate: '2021-03-10', status: 'active', department: '研发部' },
-  { id: '10', empNo: 'EMP010', name: '郑丽', position: '品牌经理', phone: '130****8010', entryDate: '2020-11-15', status: 'active', department: '市场部' },
-  { id: '11', empNo: 'EMP011', name: '马超', position: '销售经理', phone: '129****8011', entryDate: '2020-09-20', status: 'active', department: '销售部' },
-  { id: '12', empNo: 'EMP012', name: '林静', position: 'HR专员', phone: '128****8012', entryDate: '2021-06-01', status: 'active', department: '人事部' },
-  { id: '13', empNo: 'EMP013', name: '高峰', position: '会计主管', phone: '127****8013', entryDate: '2020-04-18', status: 'active', department: '财务部' },
-  { id: '14', empNo: 'EMP014', name: '杨雪', position: '运维工程师', phone: '126****8014', entryDate: '2022-01-10', status: 'active', department: '未分配' },
-  { id: '15', empNo: 'EMP015', name: '黄磊', position: '产品经理', phone: '125****8015', entryDate: '2021-09-25', status: 'active', department: '研发部' },
-  { id: '16', empNo: 'EMP016', name: '徐佳', position: '测试工程师', phone: '124****8016', entryDate: '2022-05-12', status: 'active', department: '未分配' },
-  { id: '17', empNo: 'EMP017', name: '韩冰', position: '市场专员', phone: '123****8017', entryDate: '2023-02-08', status: 'active', department: '未分配' },
-  { id: '18', empNo: 'EMP018', name: '彭涛', position: '销售代表', phone: '122****8018', entryDate: '2023-04-20', status: 'active', department: '未分配' },
-  { id: '19', empNo: 'EMP019', name: '蒋琴', position: '出纳', phone: '121****8019', entryDate: '2022-08-30', status: 'active', department: '未分配' },
-  { id: '20', empNo: 'EMP020', name: '沈云', position: 'UI设计师', phone: '120****8020', entryDate: '2022-10-15', status: 'active', department: '产品部' },
-  { id: '21', empNo: 'EMP021', name: '许刚', position: '前端工程师', phone: '119****8021', entryDate: '2021-01-15', status: 'inactive', department: '研发部' },
-  { id: '22', empNo: 'EMP022', name: '曹雪', position: '市场助理', phone: '118****8022', entryDate: '2020-12-01', status: 'inactive', department: '市场部' },
-  { id: '23', empNo: 'EMP023', name: '丁一', position: '销售代表', phone: '117****8023', entryDate: '2021-07-20', status: 'inactive', department: '销售部' },
-  { id: '24', empNo: 'EMP024', name: '冯媛', position: '招聘专员', phone: '116****8024', entryDate: '2023-06-01', status: 'active', department: '人事部' },
-];
+const today = () => new Date().toISOString().slice(0, 10);
 
 function flattenDepartments(nodes: Department[]): Department[] {
   let result: Department[] = [];
@@ -188,16 +141,44 @@ function getAllNodeOptions(nodes: Department[], prefix = '', excludeIds: string[
   return result;
 }
 
+function getDepartmentEmployeeCountMap(nodes: Department[], employees: Employee[]) {
+  const map: Record<string, number> = {};
+
+  const walk = (node: Department): number => {
+    const directCount = employees.filter((emp) => emp.department === node.name).length;
+    const childCount = node.children?.reduce((sum, child) => sum + walk(child), 0) ?? 0;
+    const total = directCount + childCount;
+    map[node.id] = total;
+    return total;
+  };
+
+  nodes.forEach(walk);
+  return map;
+}
+
+function getEmploymentStatusMeta(employee: Employee, currentDate: string) {
+  if (employee.status === 'inactive' || (employee.leaveDate && employee.leaveDate <= currentDate)) {
+    return { label: '已离职', color: 'default' as const };
+  }
+
+  if (employee.leaveDate && employee.leaveDate > currentDate) {
+    return { label: '待离职', color: 'warning' as const };
+  }
+
+  return { label: '在职', color: 'success' as const };
+}
+
 interface TreeNodeProps {
   node: Department;
   level: number;
   selectedId: string | null;
   expandedKeys: Set<string>;
+  employeeCountMap: Record<string, number>;
   onSelect: (node: Department) => void;
   onToggle: (key: string) => void;
 }
 
-const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKeys, onSelect, onToggle }) => {
+const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKeys, employeeCountMap, onSelect, onToggle }) => {
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedKeys.has(node.id);
   const isSelected = selectedId === node.id;
@@ -249,7 +230,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKe
         >
           {node.name}
         </span>
-        <Tag color="default" style={{ fontSize: '11px', padding: '2px 6px' }}>{node.employeeCount}</Tag>
+        <Tag color="default" style={{ fontSize: '11px', padding: '2px 6px' }}>{employeeCountMap[node.id] ?? 0}</Tag>
       </div>
       {hasChildren && isExpanded && (
         <div>
@@ -260,6 +241,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKe
               level={level + 1}
               selectedId={selectedId}
               expandedKeys={expandedKeys}
+              employeeCountMap={employeeCountMap}
               onSelect={onSelect}
               onToggle={onToggle}
             />
@@ -272,8 +254,9 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKe
 
 const DepartmentPage: React.FC = () => {
   const { navigate } = useNavigation();
-  const [departments, setDepartments, resetDepartments] = useLocalStorageState<Department[]>('hr-admin:departments', mockDepartments);
-  const [employees, setEmployees, resetEmployees] = useLocalStorageState<Employee[]>('hr-admin:dept-employees', mockEmployees);
+  const [departments, setDepartments, resetDepartments] = useLocalStorageState<Department[]>(DEMO_STORAGE_KEYS.departments, seedDepartments);
+  const [employees, setEmployees, resetEmployees] = useLocalStorageState<Employee[]>(DEMO_STORAGE_KEYS.employees, seedEmployees);
+  const currentDate = today();
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set(['1']));
   const [searchValue, setSearchValue] = useState('');
@@ -287,7 +270,7 @@ const DepartmentPage: React.FC = () => {
   const [empFormEditing, setEmpFormEditing] = useState(false);
   const [empFormData, setEmpFormData] = useState<Employee & { isNew?: boolean }>({
     id: '',
-    empNo: '', name: '', position: '', phone: '', entryDate: '', status: 'active', department: '',
+    empNo: '', name: '', position: '', gender: '男', phone: '', entryDate: '', status: 'active', activationStatus: true, department: '',
   });
   const [deleteEmpId, setDeleteEmpId] = useState<string | null>(null);
   const [selectedMembers, setSelectedMembers] = useState<(string | number)[]>([]);
@@ -301,6 +284,11 @@ const DepartmentPage: React.FC = () => {
   const [pendingManager, setPendingManager] = useState<Employee | null>(null);
   const [batchAssignOpen, setBatchAssignOpen] = useState(false);
   const [batchAssignDept, setBatchAssignDept] = useState<string>('');
+  const [assignDeptOpen, setAssignDeptOpen] = useState(false);
+  const [assignTargetDeptId, setAssignTargetDeptId] = useState<string>('');
+  const [assignEmployeeIds, setAssignEmployeeIds] = useState<string[]>([]);
+  const [assignSearch, setAssignSearch] = useState('');
+  const departmentCountMap = useMemo(() => getDepartmentEmployeeCountMap(departments, employees), [departments, employees]);
 
   React.useEffect(() => {
     if (departments.length > 0 && !selectedDepartment) {
@@ -312,7 +300,7 @@ const DepartmentPage: React.FC = () => {
   const handleResetToDefault = () => {
     resetDepartments();
     resetEmployees();
-    setSelectedDepartment(mockDepartments[0]);
+    setSelectedDepartment(seedDepartments[0]);
     setExpandedKeys(new Set(['1']));
     showToast('已恢复默认数据');
   };
@@ -325,6 +313,22 @@ const DepartmentPage: React.FC = () => {
     }
     return getAllNodeOptions(departments);
   }, [departments, deptFormEditing, editingDeptId]);
+  const assignDeptOptions = useMemo(() => deptOptions.filter((opt) => opt.value !== '1'), [deptOptions]);
+  const unassignedEmployees = useMemo(() => {
+    return employees.filter((e) => {
+      const deptExists = flatDepartments.some((d) => d.name === e.department);
+      return !deptExists || e.department === '未分配';
+    });
+  }, [employees, flatDepartments]);
+  const filteredAssignableEmployees = useMemo(() => {
+    if (!assignSearch.trim()) return unassignedEmployees;
+    return unassignedEmployees.filter((emp) => (
+      emp.name.includes(assignSearch) ||
+      emp.empNo.includes(assignSearch) ||
+      emp.phone.includes(assignSearch) ||
+      emp.position.includes(assignSearch)
+    ));
+  }, [assignSearch, unassignedEmployees]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -333,7 +337,7 @@ const DepartmentPage: React.FC = () => {
 
   const handleSelect = (node: Department) => {
     setSelectedDepartment(node);
-    setSelectedMembers([]);
+    setMemberCurrent(1);
   };
 
   const handleToggle = (key: string) => {
@@ -445,6 +449,13 @@ const DepartmentPage: React.FC = () => {
 
   const confirmSetManager = () => {
     if (!selectedDepartment || !pendingManager) return;
+    const pendingStatus = getEmploymentStatusMeta(pendingManager, currentDate);
+    if (pendingManager.department === '未分配' || pendingStatus.label !== '在职') {
+      showToast('已离职员工不能设为负责人');
+      setManagerConfirmOpen(false);
+      setPendingManager(null);
+      return;
+    }
     setDepartments((prev) => updateNode(prev, selectedDepartment.id, {
       manager: pendingManager.name,
       managerPhone: pendingManager.phone,
@@ -460,160 +471,60 @@ const DepartmentPage: React.FC = () => {
     const targetDept = flatDepartments.find((d) => d.id === batchAssignDept);
     if (!targetDept) return;
 
-    const unassignedEmps = employees.filter((e) => {
-      const deptExists = flatDepartments.some((d) => d.name === e.department);
-      return !deptExists || e.department === '未分配';
-    });
-
-    if (unassignedEmps.length === 0) {
+    if (unassignedEmployees.length === 0) {
       showToast('没有需要分配的员工');
       setBatchAssignOpen(false);
       return;
     }
 
     setEmployees((prev) => prev.map((e) => {
-      const shouldAssign = flatDepartments.some((d) => d.name === e.department) === false || e.department === '未分配';
+      const shouldAssign = unassignedEmployees.some((emp) => emp.id === e.id);
       if (shouldAssign) {
         return { ...e, department: targetDept.name };
       }
       return e;
     }));
 
-    setDepartments((prev) => updateNodeEmployeeCount(prev, targetDept.name, unassignedEmps.length));
     setBatchAssignOpen(false);
-    showToast(`已将 ${unassignedEmps.length} 名员工分配至「${targetDept.name}」`);
+    showToast(`已将 ${unassignedEmployees.length} 名员工分配至「${targetDept.name}」`);
     setBatchAssignDept('');
   };
 
-  const unassignedCount = useMemo(() => {
-    return employees.filter((e) => {
-      return !flatDepartments.some((d) => d.name === e.department) || e.department === '未分配';
+  const unassignedCount = unassignedEmployees.length;
+
+  const openAssignDept = () => {
+    setAssignTargetDeptId(selectedDepartment && selectedDepartment.id !== '1' ? selectedDepartment.id : '');
+    setAssignEmployeeIds([]);
+    setAssignSearch('');
+    setAssignDeptOpen(true);
+  };
+
+  const closeAssignDept = () => {
+    setAssignDeptOpen(false);
+    setAssignTargetDeptId('');
+    setAssignEmployeeIds([]);
+    setAssignSearch('');
+  };
+
+  const handleAssignDept = () => {
+    const targetId = selectedDepartment && selectedDepartment.id !== '1' ? selectedDepartment.id : assignTargetDeptId;
+    const targetDept = flatDepartments.find((d) => d.id === targetId);
+    if (!targetDept || assignEmployeeIds.length === 0) return;
+
+    const selectedAssignableIds = new Set(assignEmployeeIds);
+    const assignedCount = unassignedEmployees.filter((emp) => {
+      const statusMeta = getEmploymentStatusMeta(emp, currentDate);
+      return selectedAssignableIds.has(emp.id) && statusMeta.label === '在职';
     }).length;
-  }, [employees, flatDepartments]);
+    if (assignedCount === 0) return;
 
-  const openAddEmp = () => {
-    setEmpFormEditing(false);
-    const deptName = selectedDepartment?.id === '1' ? '未分配' : (selectedDepartment?.name || '');
-    setEmpFormData({
-      id: '',
-      empNo: '',
-      name: '',
-      position: '',
-      phone: '',
-      entryDate: new Date().toISOString().slice(0, 10),
-      status: 'active',
-      department: deptName,
-    });
-    setEmpFormOpen(true);
-  };
-
-  const openEditEmp = (emp: Employee) => {
-    setEmpFormEditing(true);
-    setEmpFormData({ ...emp });
-    setEmpFormOpen(true);
-  };
-
-  const saveEmp = () => {
-    if (!empFormData.name.trim() || !empFormData.empNo.trim()) return;
-
-    if (empFormEditing && empFormData.id) {
-      const oldEmp = employees.find((e) => e.id === empFormData.id);
-      const oldDept = oldEmp?.department;
-      const newDept = empFormData.department;
-
-      setEmployees((prev) => prev.map((e) => (e.id === empFormData.id ? (empFormData as Employee) : e)));
-
-      if (oldDept && oldDept !== newDept) {
-        setDepartments((prev) => updateNodeEmployeeCount(prev, oldDept, -1));
-        setDepartments((prev) => updateNodeEmployeeCount(prev, newDept, 1));
-      }
-      showToast('成员信息已更新');
-    } else {
-      const { isNew, id: _removed, ...empData } = empFormData;
-      const newEmp: Employee = {
-        id: Date.now().toString(),
-        empNo: empData.empNo,
-        name: empData.name,
-        position: empData.position,
-        phone: empData.phone,
-        entryDate: empData.entryDate,
-        status: empData.status,
-        department: empData.department,
-      };
-      setEmployees((prev) => [...prev, newEmp]);
-      setDepartments((prev) => updateNodeEmployeeCount(prev, empData.department, 1));
-      showToast('成员已添加');
-    }
-    setEmpFormOpen(false);
-  };
-
-  const confirmDeleteEmp = (id: string) => {
-    setDeleteEmpId(id);
-  };
-
-  const doDeleteEmp = () => {
-    if (deleteEmpId) {
-      const emp = employees.find((e) => e.id === deleteEmpId);
-      if (emp) {
-        setDepartments((prev) => updateNodeEmployeeCount(prev, emp.department, -1));
-      }
-      setEmployees((prev) => prev.filter((e) => e.id !== deleteEmpId));
-      setSelectedMembers((prev) => prev.filter((k) => k !== deleteEmpId));
-      setDeleteEmpId(null);
-      showToast('成员已删除');
-    }
-  };
-
-  const handleBatchRemove = () => {
-    if (selectedMembers.length === 0) return;
-    const empsToRemove = employees.filter((e) => selectedMembers.includes(e.id));
-    const deptCounts: Record<string, number> = {};
-    empsToRemove.forEach((emp) => {
-      deptCounts[emp.department] = (deptCounts[emp.department] || 0) + 1;
-    });
-
-    setEmployees((prev) => prev.filter((e) => !selectedMembers.includes(e.id)));
-    Object.entries(deptCounts).forEach(([dept, count]) => {
-      setDepartments((prev) => updateNodeEmployeeCount(prev, dept, -count));
-    });
-    setSelectedMembers([]);
-    showToast(`已移除 ${selectedMembers.length} 名成员`);
-  };
-
-  const handleViewEmployee = (empNo: string) => {
-    navigate('employee-detail', { employeeId: empNo });
-  };
-
-  const openTransferModal = () => {
-    if (selectedMembers.length === 0) return;
-    setTransferTargetId('');
-    setTransferModalOpen(true);
-  };
-
-  const doTransfer = () => {
-    if (!transferTargetId) return;
-    const targetDept = flatDepartments.find((d) => d.id === transferTargetId);
-    if (!targetDept) return;
-
-    const empsToTransfer = employees.filter((e) => selectedMembers.includes(e.id));
-    const sourceDeptCounts: Record<string, number> = {};
-
-    setEmployees((prev) => prev.map((e) => {
-      if (selectedMembers.includes(e.id)) {
-        sourceDeptCounts[e.department] = (sourceDeptCounts[e.department] || 0) + 1;
-        return { ...e, department: targetDept.name };
-      }
-      return e;
-    }));
-
-    Object.entries(sourceDeptCounts).forEach(([dept, count]) => {
-      setDepartments((prev) => updateNodeEmployeeCount(prev, dept, -count));
-    });
-    setDepartments((prev) => updateNodeEmployeeCount(prev, targetDept.name, selectedMembers.length));
-
-    setTransferModalOpen(false);
-    setSelectedMembers([]);
-    showToast(`已将 ${selectedMembers.length} 名成员调转至「${targetDept.name}」`);
+    setEmployees((prev) => prev.map((emp) => (
+      selectedAssignableIds.has(emp.id) && getEmploymentStatusMeta(emp, currentDate).label === '在职'
+        ? { ...emp, department: targetDept.name }
+        : emp
+    )));
+    closeAssignDept();
+    showToast(`已将 ${assignedCount} 名员工分配至「${targetDept.name}」`);
   };
 
   const deptEmployees = useMemo(() => {
@@ -630,13 +541,90 @@ const DepartmentPage: React.FC = () => {
       return (
         emp.name.includes(memberSearch) ||
         emp.empNo.includes(memberSearch) ||
-        emp.position.includes(memberSearch)
+        emp.department.includes(memberSearch)
       );
     });
   }, [deptEmployees, memberSearch]);
 
+  const employeeColumns = useMemo<TableColumn<Employee>[]>(() => [
+    {
+      key: 'empNo',
+      title: '工号',
+      align: 'center',
+      minWidth: 96,
+      dataIndex: 'empNo',
+      render: (value) => <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace', fontVariantNumeric: 'tabular-nums lining-nums', letterSpacing: 0 }}>{value}</span>,
+    },
+    {
+      key: 'name',
+      title: '姓名',
+      minWidth: 72,
+      dataIndex: 'name',
+      render: (value) => <span style={{ color: 'var(--primary-600)' }}>{value}</span>,
+    },
+    {
+      key: 'department',
+      title: '部门',
+      align: 'center',
+      minWidth: 96,
+      dataIndex: 'department',
+      render: (value) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {value === '未分配' ? (
+            <Tag color="error" style={{ backgroundColor: 'var(--error-50)', borderColor: 'var(--error-600)', color: 'var(--error-600)', fontWeight: 700, boxShadow: '0 0 0 1px rgba(220, 38, 38, 0.12)' }}>
+              未分配
+            </Tag>
+          ) : (
+            <Tag color="default" style={{ backgroundColor: 'var(--gray-50)', borderColor: 'var(--gray-200)', color: 'var(--gray-700)' }}>
+              {value}
+            </Tag>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'entryDate',
+      title: '入职时间',
+      align: 'center',
+      minWidth: 100,
+      dataIndex: 'entryDate',
+      render: (value) => (
+        <span style={{
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+          letterSpacing: 0,
+        }}>{value || '—'}</span>
+      ),
+    },
+    {
+      key: 'employmentStatus',
+      title: '在职状态',
+      align: 'center',
+      minWidth: 88,
+      dataIndex: 'status',
+      render: (_, record) => {
+        const statusMeta = getEmploymentStatusMeta(record, currentDate);
+        return <Tag color={statusMeta.color}>{statusMeta.label}</Tag>;
+      },
+    },
+  ], [currentDate]);
+
   const totalMembers = filteredEmployees.length;
-  const paginatedEmployees = filteredEmployees.slice((memberCurrent - 1) * memberPageSize, memberCurrent * memberPageSize);
+  const employeeRowActions = useMemo(() => {
+    if (!selectedDepartment) return [];
+    return [
+      {
+        key: 'manager',
+        label: '设为负责人',
+        type: 'primary' as const,
+        onClick: handleSetManager,
+        hidden: (record: Employee) => {
+          const statusMeta = getEmploymentStatusMeta(record, currentDate);
+          return record.department === '未分配' || statusMeta.label !== '在职' || record.name === selectedDepartment.manager;
+        },
+      },
+    ];
+  }, [currentDate, selectedDepartment]);
 
   const searchResults = searchValue
     ? flatDepartments.filter((d) => d.name.includes(searchValue))
@@ -671,9 +659,7 @@ const DepartmentPage: React.FC = () => {
         breadcrumb={[{ label: '首页', path: '/' }, { label: '组织架构' }, { label: '部门管理' }]}
         title="部门管理"
         description="管理企业组织架构，包括部门创建、编辑、删除及部门成员管理"
-        actions={[
-          { label: '恢复默认', buttonType: 'secondary' as const, onClick: handleResetToDefault },
-        ]}
+        actions={[]}
       />
 
       <div style={{ display: 'flex', gap: '16px' }}>
@@ -717,6 +703,7 @@ const DepartmentPage: React.FC = () => {
                 level={0}
                 selectedId={selectedDepartment?.id || null}
                 expandedKeys={expandedKeys}
+                employeeCountMap={departmentCountMap}
                 onSelect={handleSelect}
                 onToggle={handleToggle}
               />
@@ -768,108 +755,25 @@ const DepartmentPage: React.FC = () => {
                       onChange={(e) => { setMemberSearch(e.target.value); setMemberCurrent(1); }}
                       style={{ width: '180px' }}
                     />
-                    {selectedDepartment?.id === '1' ? (
-                      <>
-                        <Button size="sm" type="secondary" icon="plus" onClick={openAddEmp}>新增成员</Button>
-                        <Button size="sm" type="secondary" icon="upload" onClick={() => setBatchAssignOpen(true)}>批量分配部门</Button>
-                      </>
-                    ) : (
-                      <Button size="sm" type="secondary" icon="plus" onClick={openAddEmp}>新增成员</Button>
-                    )}
+                    <Button size="sm" type="secondary" icon="plus" onClick={openAssignDept}>分配部门</Button>
+                    <Button size="sm" type="secondary" icon="upload" onClick={() => setBatchAssignOpen(true)}>批量分配部门</Button>
                   </div>
                 </div>
-
-                {selectedMembers.length > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', backgroundColor: 'var(--primary-50)', borderRadius: 'var(--radius-sm)', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '13px', color: 'var(--primary-600)' }}>已选择 {selectedMembers.length} 项</span>
-                    <Button size="sm" type="tertiary" onClick={() => setSelectedMembers([])}>清除</Button>
-                    {selectedDepartment?.id === '1' ? (
-                      <Button size="sm" type="secondary" onClick={openTransferModal} disabled={selectedMembers.length === 0}>调转部门</Button>
-                    ) : (
-                      <>
-                        <Button size="sm" type="secondary" onClick={openTransferModal}>调转部门</Button>
-                        <Button size="sm" type="danger" onClick={handleBatchRemove}>移除部门</Button>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: 'var(--gray-50)' }}>
-                      <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)', width: '48px' }}>
-                        <input
-                          type="checkbox"
-                          checked={paginatedEmployees.length > 0 && paginatedEmployees.every((emp) => selectedMembers.includes(emp.id))}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedMembers((prev) => Array.from(new Set([...prev, ...paginatedEmployees.map((emp) => emp.id)])));
-                            } else {
-                              setSelectedMembers((prev) => prev.filter((id) => !paginatedEmployees.find((emp) => emp.id === id)));
-                            }
-                          }}
-                        />
-                      </th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)' }}>工号</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)' }}>姓名</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)' }}>职位</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)' }}>手机号</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)' }}>入职日期</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)' }}>状态</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '13px', fontWeight: 500, color: 'var(--gray-600)', borderBottom: '1px solid var(--gray-200)', width: '100px' }}>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedEmployees.map((emp) => (
-                      <tr key={emp.id} style={{ borderBottom: '1px solid var(--gray-100)' }}>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>
-                          <input
-                            type="checkbox"
-                            checked={selectedMembers.includes(emp.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) setSelectedMembers((prev) => [...prev, emp.id]);
-                              else setSelectedMembers((prev) => prev.filter((id) => id !== emp.id));
-                            }}
-                          />
-                        </td>
-                        <td style={{ padding: '12px', fontSize: '13px', color: 'var(--gray-600)' }}>{emp.empNo}</td>
-                        <td style={{ padding: '12px', fontSize: '13px', color: 'var(--primary-600)', cursor: 'pointer', fontWeight: 500 }} onClick={() => handleViewEmployee(emp.empNo)}>{emp.name}</td>
-                        <td style={{ padding: '12px', fontSize: '13px', color: 'var(--gray-600)' }}>{emp.position}</td>
-                        <td style={{ padding: '12px', fontSize: '13px', color: 'var(--gray-600)' }}>{emp.phone}</td>
-                        <td style={{ padding: '12px', fontSize: '13px', color: 'var(--gray-600)' }}>{emp.entryDate}</td>
-                        <td style={{ padding: '12px' }}>
-                          <Tag color={emp.status === 'active' ? 'success' : 'default'}>{emp.status === 'active' ? '在职' : '离职'}</Tag>
-                        </td>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>
-                          {selectedDepartment ? (
-                            emp.name === selectedDepartment.manager ? (
-                              <Tag color="success" style={{ cursor: 'default' }}>负责人</Tag>
-                            ) : (
-                              <Button size="sm" type="primary" onClick={() => handleSetManager(emp)}>设为负责人</Button>
-                            )
-                          ) : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                    {paginatedEmployees.length === 0 && (
-                      <tr>
-                        <td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)', fontSize: '13px' }}>
-                          {selectedDepartment?.id === '1' ? '暂无员工' : '该部门暂无成员'}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0' }}>
-                  <Pagination
-                    current={memberCurrent}
-                    pageSize={memberPageSize}
-                    total={totalMembers}
-                    onChange={(page) => { setMemberCurrent(page); setSelectedMembers([]); }}
-                    onPageSizeChange={(size) => { setMemberPageSize(size); setMemberCurrent(1); setSelectedMembers([]); }}
-                  />
-                </div>
+                <DataTable
+                  columns={employeeColumns}
+                  dataSource={filteredEmployees}
+                  rowKey="id"
+                  layoutMode="content"
+                  rowActions={selectedDepartment ? employeeRowActions : undefined}
+                  pagination={{
+                    current: memberCurrent,
+                    pageSize: memberPageSize,
+                    total: totalMembers,
+                    onChange: (page) => setMemberCurrent(page),
+                    onPageSizeChange: (size) => { setMemberPageSize(size); setMemberCurrent(1); },
+                  }}
+                  emptyText={selectedDepartment?.id === '1' ? '暂无员工' : '该部门暂无成员'}
+                />
               </div>
             </div>
           ) : (
@@ -933,88 +837,97 @@ const DepartmentPage: React.FC = () => {
       </Modal>
 
       <Modal
-        open={empFormOpen}
-        onClose={() => setEmpFormOpen(false)}
-        title={empFormEditing ? '编辑成员' : '新增成员'}
-        size="md"
+        open={assignDeptOpen}
+        onClose={closeAssignDept}
+        title="分配部门"
+        size="lg"
         footer={[
-          <Button key="cancel" type="secondary" onClick={() => setEmpFormOpen(false)}>取消</Button>,
-          <Button key="submit" type="primary" onClick={saveEmp}>保存</Button>,
+          <Button key="cancel" type="secondary" onClick={closeAssignDept}>取消</Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleAssignDept}
+            disabled={assignEmployeeIds.length === 0 || (!assignTargetDeptId && (!selectedDepartment || selectedDepartment.id === '1'))}
+          >
+            确认分配
+          </Button>,
         ]}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: selectedDepartment?.id === '1' ? '1fr 1.2fr' : '1fr', gap: '16px' }}>
           <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>姓名</label>
-            <Input value={empFormData.name} onChange={(e) => setEmpFormData({ ...empFormData, name: e.target.value })} />
+            <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: 'var(--info-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--info-600)' }}>
+              当前可分配员工：<strong>{unassignedCount}</strong> 人
+            </div>
+            {selectedDepartment?.id === '1' ? (
+              <div>
+                <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>目标部门</label>
+                <Select
+                  options={assignDeptOptions}
+                  placeholder="请选择目标部门"
+                  value={assignTargetDeptId}
+                  onChange={(v) => setAssignTargetDeptId(String(v))}
+                />
+              </div>
+            ) : (
+              <div style={{ padding: '12px', border: '1px solid var(--gray-200)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '13px', color: 'var(--gray-500)', marginBottom: '4px' }}>目标部门</div>
+                <div style={{ fontSize: '14px', color: 'var(--gray-800)', fontWeight: 500 }}>{selectedDepartment?.name || ''}</div>
+              </div>
+            )}
           </div>
-          <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>工号</label>
-            <Input value={empFormData.empNo} onChange={(e) => setEmpFormData({ ...empFormData, empNo: e.target.value })} />
-          </div>
-          <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>职位</label>
-            <Input value={empFormData.position} onChange={(e) => setEmpFormData({ ...empFormData, position: e.target.value })} />
-          </div>
-          <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>手机号</label>
-            <Input value={empFormData.phone} onChange={(e) => setEmpFormData({ ...empFormData, phone: e.target.value })} />
-          </div>
-          <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>入职日期</label>
-            <Input type="date" value={empFormData.entryDate} onChange={(e) => setEmpFormData({ ...empFormData, entryDate: e.target.value })} />
-          </div>
-          <div>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>状态</label>
-            <Select
-              options={[{ label: '在职', value: 'active' }, { label: '离职', value: 'inactive' }]}
-              value={empFormData.status}
-              onChange={(v) => setEmpFormData({ ...empFormData, status: v as 'active' | 'inactive' })}
-            />
-          </div>
-          <div style={{ gridColumn: 'span 2' }}>
-            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>所属部门</label>
-            <Select
-              options={empFormEditing ? deptOptions : [{ label: '未分配', value: '未分配' }, ...deptOptions.filter((d) => d.value !== '1')]}
-              value={empFormData.department}
-              onChange={(v) => setEmpFormData({ ...empFormData, department: String(v) })}
-            />
-          </div>
-        </div>
-      </Modal>
 
-      <Modal
-        open={!!deleteEmpId}
-        onClose={() => setDeleteEmpId(null)}
-        title="确认删除"
-        size="sm"
-        footer={[
-          <Button key="cancel" type="secondary" onClick={() => setDeleteEmpId(null)}>取消</Button>,
-          <Button key="submit" type="danger" onClick={doDeleteEmp}>删除</Button>,
-        ]}
-      >
-        <p style={{ fontSize: '14px', color: 'var(--gray-600)' }}>确定要删除该成员吗？删除后不可恢复。</p>
-      </Modal>
-
-      <Modal
-        open={transferModalOpen}
-        onClose={() => setTransferModalOpen(false)}
-        title="调转部门"
-        size="sm"
-        footer={[
-          <Button key="cancel" type="secondary" onClick={() => setTransferModalOpen(false)}>取消</Button>,
-          <Button key="submit" type="primary" onClick={doTransfer} disabled={!transferTargetId}>确认调转</Button>,
-        ]}
-      >
-        <div>
-          <div style={{ fontSize: '14px', color: 'var(--gray-600)', marginBottom: '16px' }}>
-            已选择 <strong>{selectedMembers.length}</strong> 名成员，调转至：
+          <div>
+            <div style={{ marginBottom: '12px' }}>
+              <Input
+                placeholder="搜索员工姓名 / 工号 / 手机号"
+                value={assignSearch}
+                onChange={(e) => setAssignSearch(e.target.value)}
+              />
+            </div>
+            <div style={{ maxHeight: '360px', overflow: 'auto', border: '1px solid var(--gray-200)', borderRadius: 'var(--radius-sm)' }}>
+              {filteredAssignableEmployees.length === 0 ? (
+                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--gray-400)', fontSize: '13px' }}>
+                  暂无可分配员工
+                </div>
+              ) : (
+                filteredAssignableEmployees.map((emp) => (
+                  <label
+                    key={emp.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      padding: '10px 12px',
+                      borderBottom: '1px solid var(--gray-100)',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--gray-50)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      <input
+                        type="checkbox"
+                        checked={assignEmployeeIds.includes(emp.id)}
+                        onChange={(e) => {
+                          setAssignEmployeeIds((prev) => (
+                            e.target.checked
+                              ? [...prev, emp.id]
+                              : prev.filter((id) => id !== emp.id)
+                          ));
+                        }}
+                      />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: '13px', color: 'var(--gray-800)', fontWeight: 500 }}>{emp.name}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--gray-500)' }}>{emp.empNo} · {emp.position} · {emp.department || '未分配'}</div>
+                      </div>
+                    </div>
+                    <Tag color="warning" style={{ whiteSpace: 'nowrap' }}>待分配</Tag>
+                  </label>
+                ))
+              )}
+            </div>
           </div>
-          <Select
-            options={transferOptions}
-            placeholder="请选择目标部门"
-            value={transferTargetId}
-            onChange={(v) => setTransferTargetId(String(v))}
-          />
         </div>
       </Modal>
 

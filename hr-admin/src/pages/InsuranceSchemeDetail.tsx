@@ -9,6 +9,14 @@ import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import {
+  DEMO_STORAGE_KEYS,
+  seedEmployees,
+  seedInsuranceMaterials,
+  seedInsuranceOperationRecords,
+  seedInsuredPersons,
+  type Employee,
+} from '../mockApi/demoData';
 
 interface InsuredPerson {
   id: string;
@@ -38,48 +46,6 @@ interface InsuranceMaterial {
   type: string;
   uploadDate: string;
 }
-
-const mockInsuredPersons: InsuredPerson[] = [
-  { id: '1', empNo: 'EMP001', name: '张伟', department: '研发部', joinDate: '2026-01', type: '员工本人', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '2', empNo: 'EMP002', name: '李娜', department: '市场部', joinDate: '2026-01', type: '员工+家属', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '3', empNo: 'EMP003', name: '王强', department: '销售部', joinDate: '2026-01', type: '员工本人', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '4', empNo: 'EMP004', name: '刘芳', department: '人事部', joinDate: '2026-01', type: '员工+家属', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '5', empNo: 'EMP005', name: '陈明', department: '研发部', joinDate: '2026-01', type: '员工本人', status: '核保中', effectiveDate: '2026-04-01' },
-  { id: '6', empNo: 'EMP006', name: '赵敏', department: '财务部', joinDate: '2026-01', type: '员工本人', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '7', empNo: 'EMP007', name: '孙浩', department: '运维部', joinDate: '2026-01', type: '员工本人', status: '待生效', effectiveDate: '2026-04-15' },
-  { id: '8', empNo: 'EMP008', name: '周婷', department: '产品部', joinDate: '2026-01', type: '员工本人', status: '即将退保', effectiveDate: '2025-01-01', expiryDate: '2026-03-31' },
-  { id: '9', empNo: 'EMP009', name: '吴昊', department: '研发部', joinDate: '2026-01', type: '员工+家属', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '10', empNo: 'EMP010', name: '郑丽', department: '市场部', joinDate: '2026-01', type: '员工本人', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-  { id: '11', empNo: 'EMP011', name: '马超', department: '销售部', joinDate: '2026-01', type: '员工本人', status: '已失效', effectiveDate: '2025-01-01', expiryDate: '2025-12-31' },
-  { id: '12', empNo: 'EMP012', name: '林静', department: '人事部', joinDate: '2026-01', type: '员工本人', status: '保障中', effectiveDate: '2026-01-01', expiryDate: '2026-12-31' },
-];
-
-const mockOperationRecords: OperationRecord[] = [
-  { id: '1', empNo: 'EMP005', name: '陈明', type: '加员', submitDate: '2026-03-20', effectiveDate: '2026-04-01', status: '待生效' },
-  { id: '2', empNo: 'EMP007', name: '孙浩', type: '加员', submitDate: '2026-04-01', effectiveDate: '2026-04-15', status: '待生效' },
-  { id: '3', empNo: 'EMP008', name: '周婷', type: '减员', submitDate: '2026-03-25', effectiveDate: '2026-04-01', status: '已生效' },
-  { id: '4', empNo: 'EMP011', name: '马超', type: '减员', submitDate: '2026-01-05', effectiveDate: '2026-01-01', status: '已生效' },
-  { id: '5', empNo: 'EMP009', name: '吴昊', type: '加员', submitDate: '2026-02-15', effectiveDate: '2026-03-01', status: '已生效' },
-  { id: '6', empNo: 'EMP010', name: '郑丽', type: '替换', submitDate: '2026-03-10', effectiveDate: '2026-04-01', status: '已生效' },
-  { id: '7', empNo: 'EMP012', name: '林静', type: '加员', submitDate: '2026-01-10', effectiveDate: '2026-02-01', status: '已生效' },
-];
-
-const mockMaterials: InsuranceMaterial[] = [
-  { id: '1', name: '2026年度保险合同.pdf', type: '保险合同', uploadDate: '2026-01-01' },
-  { id: '2', name: '保险条款说明.pdf', type: '保险条款', uploadDate: '2026-01-01' },
-  { id: '3', name: '理赔流程指引.pdf', type: '理赔指引', uploadDate: '2026-01-15' },
-  { id: '4', name: '定点医院名单.xlsx', type: '医院名单', uploadDate: '2026-02-01' },
-  { id: '5', name: '保险卡样卡.png', type: '其他', uploadDate: '2026-01-01' },
-];
-
-const mockEmployees = [
-  { empNo: 'EMP013', name: '高峰', department: '财务部', status: '已激活' },
-  { empNo: 'EMP014', name: '杨雪', department: '运维部', status: '已激活' },
-  { empNo: 'EMP015', name: '黄磊', department: '产品部', status: '已激活' },
-  { empNo: 'EMP016', name: '徐佳', department: '研发部', status: '已激活' },
-  { empNo: 'EMP017', name: '韩冰', department: '市场部', status: '已激活' },
-  { empNo: 'EMP018', name: '彭涛', department: '销售部', status: '未激活' },
-];
 
 const schemeInfo = {
   name: '企业补充医疗保险计划A',
@@ -120,9 +86,10 @@ const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) =
 
 const InsuranceSchemeDetail: React.FC = () => {
   const { navigate } = useNavigation();
-  const [persons, setPersons] = useLocalStorageState<InsuredPerson[]>('hr-admin:insured-persons', mockInsuredPersons);
-  const [records, setRecords] = useLocalStorageState<OperationRecord[]>('hr-admin:operation-records', mockOperationRecords);
-  const [materials, setMaterials] = useLocalStorageState<InsuranceMaterial[]>('hr-admin:insurance-materials', mockMaterials);
+  const [persons, setPersons] = useLocalStorageState<InsuredPerson[]>(DEMO_STORAGE_KEYS.insuredPersons, seedInsuredPersons);
+  const [records, setRecords] = useLocalStorageState<OperationRecord[]>(DEMO_STORAGE_KEYS.insuranceOperationRecords, seedInsuranceOperationRecords);
+  const [materials, setMaterials] = useLocalStorageState<InsuranceMaterial[]>(DEMO_STORAGE_KEYS.insuranceMaterials, seedInsuranceMaterials);
+  const [employees] = useLocalStorageState<Employee[]>(DEMO_STORAGE_KEYS.employees, seedEmployees);
 
   const [activeTab, setActiveTab] = useState<'list' | 'records' | 'materials'>('list');
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -147,7 +114,7 @@ const InsuranceSchemeDetail: React.FC = () => {
     });
   }, [persons, searchText, deptFilter, statusFilter]);
 
-  const handleAddMembers = (selectedEmps: typeof mockEmployees) => {
+  const handleAddMembers = (selectedEmps: Employee[]) => {
     const now = new Date();
     const newPersons: InsuredPerson[] = selectedEmps.map((emp) => ({
       id: Date.now().toString() + Math.random(),
@@ -453,6 +420,7 @@ const InsuranceSchemeDetail: React.FC = () => {
         onClose={() => setAddModalOpen(false)}
         onConfirm={handleAddMembers}
         persons={persons}
+        employees={employees}
       />
 
       <ReduceMemberModal
@@ -530,13 +498,14 @@ const InsuranceSchemeDetail: React.FC = () => {
 const AddMemberModal: React.FC<{
   open: boolean;
   onClose: () => void;
-  onConfirm: (selected: typeof mockEmployees) => void;
+  onConfirm: (selected: Employee[]) => void;
   persons: InsuredPerson[];
-}> = ({ open, onClose, onConfirm, persons }) => {
+  employees: Employee[];
+}> = ({ open, onClose, onConfirm, persons, employees }) => {
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
 
-  const availableEmployees = mockEmployees.filter(
-    (emp) => !persons.some((p) => p.empNo === emp.empNo && p.status !== '已失效')
+  const availableEmployees = employees.filter(
+    (emp) => emp.status === 'active' && !persons.some((p) => p.empNo === emp.empNo && p.status !== '已失效')
   );
 
   return (
@@ -548,7 +517,7 @@ const AddMemberModal: React.FC<{
       footer={[
         <Button key="cancel" type="secondary" onClick={onClose}>取消</Button>,
         <Button key="submit" type="primary" onClick={() => {
-          const selected = mockEmployees.filter((emp) => selectedEmployees.includes(emp.empNo));
+          const selected = employees.filter((emp) => selectedEmployees.includes(emp.empNo));
           onConfirm(selected);
           setSelectedEmployees([]);
         }}>确认加员</Button>,
@@ -586,7 +555,7 @@ const AddMemberModal: React.FC<{
                   <span style={{ fontWeight: 500 }}>{emp.name}</span>
                   <span style={{ color: 'var(--gray-400)' }}>({emp.empNo})</span>
                   <span style={{ color: 'var(--gray-500)' }}>{emp.department}</span>
-                  <Tag color={emp.status === '已激活' ? 'success' : 'default'}>{emp.status}</Tag>
+                  <Tag color={emp.activationStatus ? 'success' : 'default'}>{emp.activationStatus ? '已激活' : '未激活'}</Tag>
                 </div>
               );
             })}

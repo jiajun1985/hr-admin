@@ -9,6 +9,7 @@ export interface TableColumn<T> {
   title: string;
   dataIndex?: keyof T;
   width?: number | string;
+  minWidth?: number | string;
   align?: 'left' | 'center' | 'right';
   sorter?: boolean;
   render?: (value: any, record: T, index: number) => React.ReactNode;
@@ -19,6 +20,7 @@ interface RowAction {
   label: string;
   type?: 'primary' | 'danger' | 'default';
   onClick: (record: any) => void;
+  hidden?: (record: any) => boolean;
 }
 
 interface DataTableProps<T> {
@@ -40,6 +42,7 @@ interface DataTableProps<T> {
   loading?: boolean;
   emptyText?: string;
   emptyDescription?: string;
+  layoutMode?: 'fixed' | 'content';
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -52,7 +55,12 @@ export function DataTable<T extends Record<string, any>>({
   loading = false,
   emptyText = '暂无数据',
   emptyDescription,
+  layoutMode = 'fixed',
 }: DataTableProps<T>) {
+  const paginatedData = pagination
+    ? dataSource.slice((pagination.current - 1) * pagination.pageSize, pagination.current * pagination.pageSize)
+    : dataSource;
+
   const getRowKey = (record: T, index: number): string | number => {
     if (typeof rowKey === 'function') {
       return rowKey(record);
@@ -61,25 +69,25 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   const isAllSelected = () => {
-    if (!rowSelection || dataSource.length === 0) return false;
-    return dataSource.every((record) =>
+    if (!rowSelection || paginatedData.length === 0) return false;
+    return paginatedData.every((record) =>
       rowSelection.selectedRowKeys.includes(getRowKey(record, 0))
     );
   };
 
   const isIndeterminate = () => {
-    if (!rowSelection || dataSource.length === 0) return false;
-    const selectedCount = dataSource.filter((record) =>
+    if (!rowSelection || paginatedData.length === 0) return false;
+    const selectedCount = paginatedData.filter((record) =>
       rowSelection.selectedRowKeys.includes(getRowKey(record, 0))
     ).length;
-    return selectedCount > 0 && selectedCount < dataSource.length;
+    return selectedCount > 0 && selectedCount < paginatedData.length;
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (!rowSelection) return;
     if (checked) {
-      const allKeys = dataSource.map((record) => getRowKey(record, 0));
-      rowSelection.onChange(allKeys, dataSource);
+      const allKeys = paginatedData.map((record) => getRowKey(record, 0));
+      rowSelection.onChange(allKeys, paginatedData);
     } else {
       rowSelection.onChange([], []);
     }
@@ -91,7 +99,7 @@ export function DataTable<T extends Record<string, any>>({
     const selectedKeys = checked
       ? [...rowSelection.selectedRowKeys, key]
       : rowSelection.selectedRowKeys.filter((k) => k !== key);
-    const selectedRows = dataSource.filter((record) =>
+    const selectedRows = paginatedData.filter((record) =>
       selectedKeys.includes(getRowKey(record, 0))
     );
     rowSelection.onChange(selectedKeys, selectedRows);
@@ -100,12 +108,15 @@ export function DataTable<T extends Record<string, any>>({
   const containerStyle: React.CSSProperties = {
     backgroundColor: 'var(--gray-0)',
     borderRadius: 'var(--radius-md)',
-    overflow: 'hidden',
+    overflowX: 'auto',
+    overflowY: 'hidden',
   };
 
   const tableStyle: React.CSSProperties = {
-    width: '100%',
+    width: layoutMode === 'content' ? 'max-content' : '100%',
+    minWidth: '100%',
     borderCollapse: 'collapse',
+    tableLayout: layoutMode === 'content' ? 'auto' : 'fixed',
   };
 
   const theadStyle: React.CSSProperties = {
@@ -113,21 +124,36 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   const thStyle = (align: 'left' | 'center' | 'right' = 'left'): React.CSSProperties => ({
-    padding: '12px 16px',
+    padding: '14px 16px',
     fontSize: '13px',
     fontWeight: 500,
+    lineHeight: 1.4,
     color: 'var(--gray-600)',
     textAlign: align,
     borderBottom: '1px solid var(--gray-200)',
     whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    verticalAlign: 'middle',
+    fontVariantNumeric: 'tabular-nums',
+    fontFeatureSettings: '"tnum" 1, "lnum" 1',
+    letterSpacing: 0,
   });
 
   const tdStyle = (align: 'left' | 'center' | 'right' = 'left'): React.CSSProperties => ({
     padding: '14px 16px',
     fontSize: '13px',
+    lineHeight: 1.4,
     color: 'var(--gray-600)',
     textAlign: align,
     borderBottom: '1px solid var(--gray-100)',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    verticalAlign: 'middle',
+    fontVariantNumeric: 'tabular-nums',
+    fontFeatureSettings: '"tnum" 1, "lnum" 1',
+    letterSpacing: 0,
   });
 
   const trStyle = (isHovered: boolean): React.CSSProperties => ({
@@ -186,13 +212,14 @@ export function DataTable<T extends Record<string, any>>({
                 style={{
                   ...thStyle(column.align || 'left'),
                   width: column.width,
+                  minWidth: column.minWidth,
                 }}
               >
                 {column.title}
               </th>
             ))}
             {rowActions && rowActions.length > 0 && (
-              <th style={{ ...thStyle('right'), width: rowActions.length * 60 + 20 }}>
+              <th style={{ ...thStyle('center'), width: rowActions.length * 44 + 16 }}>
                 操作
               </th>
             )}
@@ -220,7 +247,7 @@ export function DataTable<T extends Record<string, any>>({
               </td>
             </tr>
           ) : (
-            dataSource.map((record, index) => {
+            paginatedData.map((record, index) => {
               const rowKeyValue = getRowKey(record, index);
               const isSelected = rowSelection?.selectedRowKeys.includes(rowKeyValue);
               return (
@@ -326,6 +353,7 @@ function RowRenderer<T extends Record<string, any>>({
           style={{
             ...tdStyle(column.align || 'left'),
             width: column.width,
+            minWidth: column.minWidth,
           }}
         >
           {column.render
@@ -334,26 +362,33 @@ function RowRenderer<T extends Record<string, any>>({
         </td>
       ))}
       {rowActions && rowActions.length > 0 && (
-        <td style={{ ...tdStyle('right'), width: rowActions.length * 60 + 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px' }}>
-            {rowActions.map((action) => (
-              <button
-                key={action.key}
-                onClick={() => action.onClick(record)}
-                style={{
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  color: getActionColor(action.type),
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  padding: 0,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-              >
-                {action.label}
-              </button>
-            ))}
+        <td style={{ ...tdStyle('center'), width: rowActions.length * 44 + 16, paddingTop: '0', paddingBottom: '0' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '22px' }}>
+            {rowActions.map((action) =>
+              action.hidden?.(record) ? null : (
+                <button
+                  key={action.key}
+                  onClick={() => action.onClick(record)}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: getActionColor(action.type),
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    lineHeight: 1,
+                    height: '22px',
+                    padding: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    fontWeight: 400,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                  onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                >
+                  {action.label}
+                </button>
+              )
+            )}
           </div>
         </td>
       )}

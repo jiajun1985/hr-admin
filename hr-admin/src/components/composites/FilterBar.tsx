@@ -8,6 +8,7 @@ export interface Filter {
   key: string;
   label: string;
   type?: 'select' | 'input';
+  buttonType?: 'select' | 'input';
   options?: SelectOption[];
   placeholder?: string;
 }
@@ -28,6 +29,7 @@ interface FilterBarProps {
   filterValues?: Record<string, string | number | (string | number)[]>;
   onFilterChange?: (key: string, value: string | number | (string | number)[]) => void;
   onReset?: () => void;
+  hideLabels?: boolean;
   batchBar?: {
     selectedCount: number;
     actions: BatchAction[];
@@ -43,6 +45,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   filterValues = {},
   onFilterChange,
   onReset,
+  hideLabels = false,
   batchBar,
 }) => {
   const [internalSearchValue, setInternalSearchValue] = React.useState('');
@@ -81,7 +84,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const filterItemStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: hideLabels ? '0' : '8px',
     minWidth: '140px',
   };
 
@@ -138,27 +141,30 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
+              contentColor="var(--gray-500)"
             />
           </div>
 
           {filters.map((filter) => (
             <div key={filter.key} style={filterItemStyle}>
-              <span style={filterLabelStyle}>{filter.label}</span>
-              {filter.type === 'select' && filter.options && (
+              {!hideLabels && <span style={filterLabelStyle}>{filter.label}</span>}
+              {(filter.type === 'select' || filter.buttonType === 'select') && filter.options && (
                 <Select
                   options={filter.options}
                   value={filterValues[filter.key]}
                   onChange={(value) => onFilterChange?.(filter.key, value)}
-                  placeholder={filter.placeholder || '全部'}
+                  placeholder={filter.placeholder || (hideLabels ? filter.label : '全部')}
                   style={{ width: '120px' }}
+                  contentColor="var(--gray-500)"
                 />
               )}
-              {filter.type === 'input' && (
+              {(filter.type === 'input' || filter.buttonType === 'input') && (
                 <Input
-                  placeholder={filter.placeholder}
+                  placeholder={filter.placeholder || (hideLabels ? filter.label : undefined)}
                   value={filterValues[filter.key] as string}
                   onChange={(e) => onFilterChange?.(filter.key, e.target.value)}
                   style={{ width: '120px' }}
+                  contentColor="var(--gray-500)"
                 />
               )}
             </div>

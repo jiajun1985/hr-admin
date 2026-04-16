@@ -7,47 +7,10 @@ import { Modal } from '../components/basics/Modal';
 import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
+import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
-
-interface Employee {
-  id: string;
-  empNo: string;
-  name: string;
-  department: string;
-  position: string;
-  gender: string;
-  phone: string;
-  status: 'active' | 'inactive';
-  activationStatus: boolean;
-  entryDate: string;
-}
-
-const mockEmployees: Employee[] = [
-  { id: '1', empNo: 'EMP001', name: '张伟', department: '研发部', position: '技术总监', gender: '男', phone: '138****8001', status: 'active', activationStatus: true, entryDate: '2018-03-15' },
-  { id: '2', empNo: 'EMP002', name: '李娜', department: '市场部', position: '市场总监', gender: '女', phone: '139****8002', status: 'active', activationStatus: true, entryDate: '2019-01-20' },
-  { id: '3', empNo: 'EMP003', name: '王强', department: '销售部', position: '销售总监', gender: '男', phone: '137****8003', status: 'active', activationStatus: true, entryDate: '2018-06-10' },
-  { id: '4', empNo: 'EMP004', name: '刘芳', department: '人事部', position: '人事总监', gender: '女', phone: '136****8004', status: 'active', activationStatus: true, entryDate: '2018-02-01' },
-  { id: '5', empNo: 'EMP005', name: '陈明', department: '研发部', position: '高级前端工程师', gender: '男', phone: '135****8005', status: 'active', activationStatus: true, entryDate: '2020-07-08' },
-  { id: '6', empNo: 'EMP006', name: '赵敏', department: '财务部', position: '财务总监', gender: '女', phone: '134****8006', status: 'active', activationStatus: true, entryDate: '2018-04-20' },
-  { id: '7', empNo: 'EMP007', name: '孙浩', department: '研发部', position: '运维主管', gender: '男', phone: '133****8007', status: 'active', activationStatus: true, entryDate: '2019-08-15' },
-  { id: '8', empNo: 'EMP008', name: '周婷', department: '研发部', position: '产品总监', gender: '女', phone: '132****8008', status: 'active', activationStatus: true, entryDate: '2019-05-28' },
-  { id: '9', empNo: 'EMP009', name: '吴昊', department: '研发部', position: 'Java开发工程师', gender: '男', phone: '131****8009', status: 'active', activationStatus: true, entryDate: '2021-03-10' },
-  { id: '10', empNo: 'EMP010', name: '郑丽', department: '市场部', position: '品牌经理', gender: '女', phone: '130****8010', status: 'active', activationStatus: true, entryDate: '2020-11-15' },
-  { id: '11', empNo: 'EMP011', name: '马超', department: '销售部', position: '销售经理', gender: '男', phone: '129****8011', status: 'active', activationStatus: true, entryDate: '2020-09-20' },
-  { id: '12', empNo: 'EMP012', name: '林静', department: '人事部', position: 'HR专员', gender: '女', phone: '128****8012', status: 'active', activationStatus: true, entryDate: '2021-06-01' },
-  { id: '13', empNo: 'EMP013', name: '高峰', department: '财务部', position: '会计主管', gender: '男', phone: '127****8013', status: 'active', activationStatus: true, entryDate: '2020-04-18' },
-  { id: '14', empNo: 'EMP014', name: '杨雪', department: '未分配', position: '运维工程师', gender: '女', phone: '126****8014', status: 'active', activationStatus: true, entryDate: '2022-01-10' },
-  { id: '15', empNo: 'EMP015', name: '黄磊', department: '研发部', position: '产品经理', gender: '男', phone: '125****8015', status: 'active', activationStatus: true, entryDate: '2021-09-25' },
-  { id: '16', empNo: 'EMP016', name: '徐佳', department: '未分配', position: '测试工程师', gender: '女', phone: '124****8016', status: 'active', activationStatus: true, entryDate: '2022-05-12' },
-  { id: '17', empNo: 'EMP017', name: '韩冰', department: '未分配', position: '市场专员', gender: '男', phone: '123****8017', status: 'active', activationStatus: true, entryDate: '2023-02-08' },
-  { id: '18', empNo: 'EMP018', name: '彭涛', department: '未分配', position: '销售代表', gender: '男', phone: '122****8018', status: 'active', activationStatus: true, entryDate: '2023-04-20' },
-  { id: '19', empNo: 'EMP019', name: '蒋琴', department: '未分配', position: '出纳', gender: '女', phone: '121****8019', status: 'active', activationStatus: true, entryDate: '2022-08-30' },
-  { id: '20', empNo: 'EMP020', name: '沈云', department: '研发部', position: 'UI设计师', gender: '女', phone: '120****8020', status: 'active', activationStatus: true, entryDate: '2022-10-15' },
-  { id: '21', empNo: 'EMP021', name: '许刚', department: '研发部', position: '前端工程师', gender: '男', phone: '119****8021', status: 'inactive', activationStatus: false, entryDate: '2021-01-15' },
-  { id: '22', empNo: 'EMP022', name: '曹雪', department: '市场部', position: '市场助理', gender: '女', phone: '118****8022', status: 'inactive', activationStatus: false, entryDate: '2020-12-01' },
-  { id: '23', empNo: 'EMP023', name: '丁一', department: '销售部', position: '销售代表', gender: '男', phone: '117****8023', status: 'inactive', activationStatus: false, entryDate: '2021-07-20' },
-  { id: '24', empNo: 'EMP024', name: '冯媛', department: '人事部', position: '招聘专员', gender: '女', phone: '116****8024', status: 'active', activationStatus: true, entryDate: '2023-06-01' },
-];
+import { seedEmployees } from '../mockApi/employeeSeedData';
+import type { Employee } from '../mockApi/types';
 
 const departmentOptions = [
   { label: '研发部', value: '研发部' },
@@ -58,20 +21,97 @@ const departmentOptions = [
   { label: '未分配', value: '未分配' },
 ];
 
+const idTypeOptions = [
+  { label: '身份证', value: '身份证' },
+  { label: '护照', value: '护照' },
+  { label: '港澳通行证', value: '港澳通行证' },
+  { label: '台湾通行证', value: '台湾通行证' },
+  { label: '其他', value: '其他' },
+];
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+const formatEmptyDate = (value?: string) => value || '—';
+
+const getEmploymentStatusMeta = (employee: Employee, currentDate: string) => {
+  if (employee.status === 'inactive' || (employee.leaveDate && employee.leaveDate <= currentDate)) {
+    return { label: '已离职', color: 'default' as const };
+  }
+
+  if (employee.leaveDate && employee.leaveDate > currentDate) {
+    return { label: '待离职', color: 'warning' as const };
+  }
+
+  return { label: '在职', color: 'success' as const };
+};
+
+const tableCellContentStyle: React.CSSProperties = {
+  minHeight: '22px',
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const centeredCellContentStyle: React.CSSProperties = {
+  ...tableCellContentStyle,
+  justifyContent: 'center',
+};
+
+const latinCellStyle: React.CSSProperties = {
+  ...tableCellContentStyle,
+  fontFamily:
+    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+  fontVariantNumeric: 'tabular-nums lining-nums',
+  letterSpacing: 0,
+};
+
+const centeredLatinCellStyle: React.CSSProperties = {
+  ...latinCellStyle,
+  justifyContent: 'center',
+};
+
+const renderDepartmentTag = (value: string) => {
+  if (value === '未分配') {
+    return (
+      <Tag
+        color="error"
+        style={{
+          backgroundColor: 'var(--error-50)',
+          borderColor: 'var(--error-600)',
+          color: 'var(--error-600)',
+          fontWeight: 700,
+          boxShadow: '0 0 0 1px rgba(220, 38, 38, 0.12)',
+        }}
+      >
+        未分配
+      </Tag>
+    );
+  }
+
+  return (
+    <Tag color="default" style={{ backgroundColor: 'var(--gray-50)', borderColor: 'var(--gray-200)', color: 'var(--gray-700)' }}>
+      {value}
+    </Tag>
+  );
+};
+
 const emptyForm: Omit<Employee, 'id' | 'empNo'> & { empNo?: string } = {
   empNo: '',
   name: '',
   department: '',
   position: '',
   gender: '男',
+  idType: '身份证',
+  idCard: '',
   phone: '',
   status: 'active',
   activationStatus: false,
   entryDate: '',
+  leaveDate: '',
 };
 
 const EmployeeList: React.FC = () => {
-  const [employees, setEmployees] = useLocalStorageState<Employee[]>('hr-admin:employees', mockEmployees);
+  const currentDate = today();
+  const [employees, setEmployees] = useLocalStorageState<Employee[]>(DEMO_STORAGE_KEYS.employees, seedEmployees);
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [filterValues, setFilterValues] = useState<Record<string, any>>({});
@@ -79,8 +119,9 @@ const EmployeeList: React.FC = () => {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState(emptyForm);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [leavingId, setLeavingId] = useState<string | null>(null);
+  const [leaveDateInput, setLeaveDateInput] = useState('');
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -98,16 +139,27 @@ const EmployeeList: React.FC = () => {
       department: record.department,
       position: record.position,
       gender: record.gender,
+      idType: record.idType ?? '身份证',
+      idCard: record.idCard ?? '',
       phone: record.phone,
       status: record.status,
       activationStatus: record.activationStatus,
       entryDate: record.entryDate,
+      leaveDate: record.leaveDate ?? '',
     });
     setFormModalOpen(true);
   };
 
   const handleSave = () => {
-    if (!formData.name || !formData.empNo) return;
+    if (!formData.name || !formData.idType || !formData.idCard) return;
+    const normalizedLeaveDate = formData.status === 'inactive' ? formData.leaveDate || currentDate : '';
+    const normalizedStatus = normalizedLeaveDate && normalizedLeaveDate > currentDate
+      ? 'active'
+      : formData.status === 'inactive'
+        ? 'inactive'
+        : 'active';
+    const normalizedActivation = formData.activationStatus;
+
     if (editingId) {
       setEmployees((prev) =>
         prev.map((emp) =>
@@ -119,10 +171,13 @@ const EmployeeList: React.FC = () => {
                 department: formData.department,
                 position: formData.position,
                 gender: formData.gender,
+                idType: formData.idType,
+                idCard: formData.idCard,
                 phone: formData.phone,
-                status: formData.status as 'active' | 'inactive',
-                activationStatus: formData.activationStatus,
+                status: normalizedStatus,
+                activationStatus: normalizedActivation,
                 entryDate: formData.entryDate,
+                leaveDate: normalizedLeaveDate,
               } as Employee)
             : emp
         )
@@ -135,10 +190,13 @@ const EmployeeList: React.FC = () => {
         department: formData.department,
         position: formData.position,
         gender: formData.gender,
+        idType: formData.idType,
+        idCard: formData.idCard,
         phone: formData.phone,
-        status: (formData.status as 'active' | 'inactive') || 'active',
-        activationStatus: formData.activationStatus,
+        status: normalizedStatus,
+        activationStatus: normalizedActivation,
         entryDate: formData.entryDate || new Date().toISOString().slice(0, 10),
+        leaveDate: normalizedLeaveDate,
       };
       setEmployees((prev) => [...prev, newEmployee]);
     }
@@ -147,32 +205,59 @@ const EmployeeList: React.FC = () => {
     setFormData(emptyForm);
   };
 
-  const confirmDelete = (id: string) => {
-    setDeletingId(id);
-    setDeleteModalOpen(true);
+  const confirmLeave = (id: string) => {
+    setLeavingId(id);
+    setLeaveDateInput('');
+    setLeaveConfirmOpen(true);
   };
 
-  const handleDelete = () => {
-    if (deletingId) {
-      setEmployees((prev) => prev.filter((emp) => emp.id !== deletingId));
-      setSelectedRowKeys((prev) => prev.filter((k) => k !== deletingId));
-      setDeletingId(null);
-      setDeleteModalOpen(false);
+  const handleLeaveConfirm = () => {
+    if (leavingId && leaveDateInput) {
+      const normalizedStatus = leaveDateInput > currentDate ? 'active' : 'inactive';
+      setEmployees((prev) =>
+        prev.map((emp) =>
+          emp.id === leavingId
+            ? { ...emp, status: normalizedStatus, leaveDate: leaveDateInput }
+            : emp
+        )
+      );
+      setSelectedRowKeys((prev) => prev.filter((k) => k !== leavingId));
+      setLeavingId(null);
+      setLeaveDateInput('');
+      setLeaveConfirmOpen(false);
     }
-  };
-
-  const handleLeave = (record: Employee) => {
-    setEmployees((prev) =>
-      prev.map((emp) => (emp.id === record.id ? { ...emp, status: 'inactive' as const } : emp))
-    );
   };
 
   const handleBatchLeave = () => {
     setEmployees((prev) =>
-      prev.map((emp) => (selectedRowKeys.includes(emp.id) ? { ...emp, status: 'inactive' as const } : emp))
+      prev.map((emp) =>
+        selectedRowKeys.includes(emp.id)
+          ? { ...emp, status: 'inactive' as const, leaveDate: currentDate }
+          : emp
+      )
     );
     setSelectedRowKeys([]);
   };
+
+  React.useEffect(() => {
+    setEmployees((prev) => {
+      let changed = false;
+      const next = prev.map((emp) => {
+        if (emp.leaveDate && emp.leaveDate <= currentDate && emp.status !== 'inactive') {
+          changed = true;
+          return { ...emp, status: 'inactive' as const };
+        }
+
+        if (emp.leaveDate && emp.leaveDate > currentDate && emp.status !== 'active') {
+          changed = true;
+          return { ...emp, status: 'active' as const };
+        }
+
+        return emp;
+      });
+      return changed ? next : prev;
+    });
+  }, [currentDate, setEmployees]);
 
   const filteredData = useMemo(() => {
     return employees.filter((emp) => {
@@ -187,10 +272,12 @@ const EmployeeList: React.FC = () => {
     });
   }, [employees, searchValue, filterValues]);
 
-  const paginatedData = useMemo(() => {
-    const start = (current - 1) * pageSize;
-    return filteredData.slice(start, start + pageSize);
-  }, [filteredData, current, pageSize]);
+  const selectedEmployees = useMemo(
+    () => employees.filter((emp) => selectedRowKeys.includes(emp.id)),
+    [employees, selectedRowKeys]
+  );
+
+  const hasInactiveSelected = selectedEmployees.some((emp) => emp.status === 'inactive');
 
   const handlePageChange = (page: number) => {
     setCurrent(page);
@@ -220,45 +307,131 @@ const EmployeeList: React.FC = () => {
   };
 
   const columns: TableColumn<Employee>[] = [
-    { key: 'empNo', title: '工号', width: 100, dataIndex: 'empNo' },
+    {
+      key: 'empNo',
+      title: '工号',
+      align: 'center',
+      minWidth: 92,
+      dataIndex: 'empNo',
+      render: (value) => <span style={centeredLatinCellStyle}>{value}</span>,
+    },
     {
       key: 'name',
       title: '姓名',
-      width: 100,
+      minWidth: 72,
       dataIndex: 'name',
       render: (value) => (
-        <span style={{ color: 'var(--primary-600)', cursor: 'pointer', fontWeight: 500 }}>{value}</span>
+        <span style={{ color: 'var(--primary-600)', cursor: 'pointer' }}>{value}</span>
       ),
     },
     {
       key: 'department',
       title: '部门',
-      width: 120,
+      align: 'center',
+      minWidth: 96,
       dataIndex: 'department',
-      render: (value) => <Tag>{value}</Tag>,
+      render: (value) => <div style={centeredCellContentStyle}>{renderDepartmentTag(String(value))}</div>,
     },
-    { key: 'position', title: '职位', width: 140, dataIndex: 'position' },
-    { key: 'gender', title: '性别', width: 60, align: 'center', dataIndex: 'gender' },
-    { key: 'phone', title: '手机号', width: 120, dataIndex: 'phone' },
+    { key: 'gender', title: '性别', align: 'center', minWidth: 56, dataIndex: 'gender' },
     {
-      key: 'status',
-      title: '状态',
-      width: 120,
+      key: 'idType',
+      title: '证件类型',
+      align: 'center',
+      minWidth: 100,
+      dataIndex: 'idType',
+      render: (value) => <div style={centeredCellContentStyle}>{value || '—'}</div>,
+    },
+    {
+      key: 'idCard',
+      title: '证件号',
+      align: 'center',
+      minWidth: 168,
+      dataIndex: 'idCard',
+      render: (value) => <div style={centeredLatinCellStyle}>{value || '—'}</div>,
+    },
+    {
+      key: 'phone',
+      title: '手机号',
+      align: 'center',
+      minWidth: 120,
+      dataIndex: 'phone',
+      render: (value) => <span style={centeredLatinCellStyle}>{value}</span>,
+    },
+    {
+      key: 'employmentStatus',
+      title: '在职状态',
+      align: 'center',
+      minWidth: 88,
       dataIndex: 'status',
-      render: (value, record) => (
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          <Tag color={value === 'active' ? 'success' : 'default'}>{value === 'active' ? '在职' : '离职'}</Tag>
-          <Tag color={record.activationStatus ? 'primary' : 'warning'}>{record.activationStatus ? '已激活' : '未激活'}</Tag>
-        </div>
+      render: (_, record) => {
+        const statusMeta = getEmploymentStatusMeta(record, currentDate);
+        return <Tag color={statusMeta.color}>{statusMeta.label}</Tag>;
+      },
+    },
+    {
+      key: 'activationStatus',
+      title: '激活状态',
+      align: 'center',
+      minWidth: 88,
+      dataIndex: 'activationStatus',
+      render: (value) =>
+        value ? (
+          <Tag
+            color="success"
+            style={{
+              backgroundColor: 'var(--success-50)',
+              color: 'var(--success-600)',
+              border: 'none',
+              boxShadow: 'none',
+            }}
+          >
+            已激活
+          </Tag>
+        ) : (
+          <Tag
+            color="error"
+            style={{
+              backgroundColor: 'var(--error-50)',
+              color: 'var(--error-600)',
+              border: 'none',
+              boxShadow: 'none',
+            }}
+          >
+            未激活
+          </Tag>
+        ),
+    },
+    {
+      key: 'entryDate',
+      title: '入职时间',
+      align: 'center',
+      minWidth: 96,
+      dataIndex: 'entryDate',
+      render: (value) => <span style={centeredLatinCellStyle}>{value}</span>,
+    },
+    {
+      key: 'leaveDate',
+      title: '离职日期',
+      align: 'center',
+      minWidth: 88,
+      dataIndex: 'leaveDate',
+      render: (value) => (
+        <span style={{ ...centeredLatinCellStyle, color: value ? 'var(--gray-600)' : 'var(--gray-400)' }}>
+          {formatEmptyDate(value as string)}
+        </span>
       ),
     },
-    { key: 'entryDate', title: '入职时间', width: 110, dataIndex: 'entryDate' },
   ];
 
   const rowActions = [
     { key: 'edit', label: '编辑', type: 'primary' as const, onClick: openEditModal },
-    { key: 'leave', label: '离职', type: 'danger' as const, onClick: handleLeave },
-    { key: 'delete', label: '删除', type: 'danger' as const, onClick: (record: Employee) => confirmDelete(record.id) },
+    {
+      key: 'leave',
+      label: '离职',
+      type: 'danger' as const,
+      onClick: (record: Employee) => confirmLeave(record.id),
+      hidden: (record: Employee) => record.status === 'inactive',
+    },
   ];
 
   const filters = [
@@ -270,7 +443,7 @@ const EmployeeList: React.FC = () => {
     },
     {
       key: 'status',
-      label: '状态',
+      label: '在职状态',
       buttonType: 'select' as const,
       options: [
         { label: '全部', value: '' },
@@ -281,9 +454,9 @@ const EmployeeList: React.FC = () => {
   ];
 
   const batchActions = [
-    { key: 'points', label: '发放积分', onClick: () => console.log('发放积分') },
-    { key: 'department', label: '调整部门', onClick: () => console.log('调整部门') },
-    { key: 'leave', label: '批量离职', buttonType: 'danger' as const, onClick: handleBatchLeave },
+    { key: 'points', label: '发放积分', disabled: hasInactiveSelected, onClick: () => console.log('发放积分') },
+    { key: 'department', label: '调整部门', disabled: hasInactiveSelected, onClick: () => console.log('调整部门') },
+    { key: 'leave', label: '批量离职', buttonType: 'danger' as const, disabled: hasInactiveSelected, onClick: handleBatchLeave },
   ];
 
   const pageActions = [
@@ -312,8 +485,10 @@ const EmployeeList: React.FC = () => {
         searchPlaceholder="输入姓名/工号/部门..."
         filters={filters}
         columns={columns}
-        dataSource={paginatedData}
+        dataSource={filteredData}
         rowKey="id"
+        tableLayoutMode="content"
+        hideFilterLabels
         rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
         rowActions={rowActions}
         batchActions={batchActions}
@@ -379,9 +554,7 @@ const EmployeeList: React.FC = () => {
               />
             </div>
             <div>
-              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>
-                工号 <span style={{ color: 'var(--error-600)' }}>*</span>
-              </label>
+              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>工号</label>
               <Input
                 placeholder="请输入工号"
                 value={formData.empNo}
@@ -394,6 +567,27 @@ const EmployeeList: React.FC = () => {
                 placeholder="请输入手机号"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>
+                证件类型 <span style={{ color: 'var(--error-600)' }}>*</span>
+              </label>
+              <Select
+                options={idTypeOptions}
+                placeholder="请选择证件类型"
+                value={formData.idType}
+                onChange={(v) => setFormData({ ...formData, idType: String(v) })}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>
+                证件号 <span style={{ color: 'var(--error-600)' }}>*</span>
+              </label>
+              <Input
+                placeholder="请输入证件号"
+                value={formData.idCard}
+                onChange={(e) => setFormData({ ...formData, idCard: e.target.value })}
               />
             </div>
             <div>
@@ -430,22 +624,25 @@ const EmployeeList: React.FC = () => {
                 onChange={(v) => setFormData({ ...formData, gender: String(v) })}
               />
             </div>
+            {editingId ? (
+              <div>
+                <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>在职状态</label>
+                <Select
+                  options={[{ label: '在职', value: 'active' }, { label: '离职', value: 'inactive' }]}
+                  placeholder="请选择状态"
+                  value={formData.status}
+                  onChange={(v) => setFormData({ ...formData, status: String(v) as 'active' | 'inactive' })}
+                />
+              </div>
+            ) : null}
             <div>
-              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>在职状态</label>
-              <Select
-                options={[{ label: '在职', value: 'active' }, { label: '离职', value: 'inactive' }]}
-                placeholder="请选择状态"
-                value={formData.status}
-                onChange={(v) => setFormData({ ...formData, status: String(v) as 'active' | 'inactive' })}
-              />
-            </div>
-            <div>
-              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>激活状态</label>
-              <Select
-                options={[{ label: '已激活', value: 'true' }, { label: '未激活', value: 'false' }]}
-                placeholder="请选择"
-                value={String(formData.activationStatus)}
-                onChange={(v) => setFormData({ ...formData, activationStatus: v === 'true' })}
+              <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>离职日期</label>
+              <Input
+                type="date"
+                value={formData.leaveDate}
+                disabled={formData.status === 'active'}
+                placeholder={formData.status === 'active' ? '在职员工可为空' : '请选择离职日期'}
+                onChange={(e) => setFormData({ ...formData, leaveDate: e.target.value })}
               />
             </div>
           </div>
@@ -453,16 +650,46 @@ const EmployeeList: React.FC = () => {
       </Modal>
 
       <Modal
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        title="确认删除"
+        open={leaveConfirmOpen}
+        onClose={() => {
+          setLeaveConfirmOpen(false);
+          setLeavingId(null);
+          setLeaveDateInput('');
+        }}
+        title="确认离职"
         size="sm"
         footer={[
-          <Button key="cancel" type="secondary" onClick={() => setDeleteModalOpen(false)}>取消</Button>,
-          <Button key="submit" type="danger" onClick={handleDelete}>删除</Button>,
+          <Button
+            key="cancel"
+            type="secondary"
+            onClick={() => {
+              setLeaveConfirmOpen(false);
+              setLeavingId(null);
+              setLeaveDateInput('');
+            }}
+          >
+            取消
+          </Button>,
+          <Button key="submit" type="danger" onClick={handleLeaveConfirm} disabled={!leaveDateInput}>
+            确认离职
+          </Button>,
         ]}
       >
-        <p style={{ fontSize: '14px', color: 'var(--gray-600)' }}>确定要删除该员工吗？删除后不可恢复。</p>
+        <div style={{ display: 'grid', gap: '12px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--gray-600)', lineHeight: 1.8 }}>
+            确定要将该员工标记为离职吗？请先填写离职日期。
+          </p>
+          <div>
+            <label style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '6px', display: 'block' }}>
+              离职日期
+            </label>
+            <Input
+              type="date"
+              value={leaveDateInput}
+              onChange={(e) => setLeaveDateInput(e.target.value)}
+            />
+          </div>
+        </div>
       </Modal>
     </>
   );

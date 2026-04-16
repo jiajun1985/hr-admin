@@ -7,6 +7,7 @@ import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Checkbox } from '../components/basics/Checkbox';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedPermissions, seedRoles } from '../mockApi/demoData';
 
 interface Role {
   id: string;
@@ -25,38 +26,14 @@ interface Permission {
   description: string;
 }
 
-const mockRoles: Role[] = [
-  { id: '1', name: '超级管理员', description: '拥有系统所有权限，可进行系统配置和管理', userCount: 2, permissions: ['*'], createTime: '2023-01-01', status: 'active' },
-  { id: '2', name: 'HR管理员', description: '负责人事档案管理、员工福利管理等核心业务操作', userCount: 5, permissions: ['p1', 'p2', 'p3', 'p4', 'p7', 'p9'], createTime: '2023-03-15', status: 'active' },
-  { id: '3', name: '财务管理员', description: '负责账单管理、发票处理、财务报表查看', userCount: 3, permissions: ['p7', 'p8'], createTime: '2023-04-20', status: 'active' },
-  { id: '4', name: '运营专员', description: '负责福利方案配置、活动发布、积分管理等日常运营工作', userCount: 8, permissions: ['p3', 'p4', 'p5', 'p6', 'p9', 'p10'], createTime: '2023-06-01', status: 'active' },
-  { id: '5', name: '部门主管', description: '查看本部门员工信息、审批员工申请、查看部门报表', userCount: 25, permissions: ['p2', 'p11'], createTime: '2023-08-10', status: 'active' },
-  { id: '6', name: '普通员工', description: '查看个人福利信息、使用积分商城、参与活动报名', userCount: 1162, permissions: ['p2', 'p6', 'p10'], createTime: '2023-09-01', status: 'active' },
-];
-
-const mockPermissions: Permission[] = [
-  { id: 'p1', name: '员工档案管理', category: '员工管理', description: '查看、编辑、添加、删除员工档案' },
-  { id: 'p2', name: '员工信息查看', category: '员工管理', description: '仅查看员工基本信息' },
-  { id: 'p3', name: '福利方案配置', category: '福利管理', description: '配置和管理企业福利方案' },
-  { id: 'p4', name: '福利方案查看', category: '福利管理', description: '仅查看福利方案配置' },
-  { id: 'p5', name: '积分管理', category: '积分管理', description: '进行积分发放、扣除、查询等操作' },
-  { id: 'p6', name: '积分查看', category: '积分管理', description: '仅查看积分余额和明细' },
-  { id: 'p7', name: '账单管理', category: '财务管理', description: '查看账单、发起支付、下载发票' },
-  { id: 'p8', name: '账单查看', category: '财务管理', description: '仅查看账单信息' },
-  { id: 'p9', name: '公告发布', category: '运营管理', description: '创建、编辑、发布企业公告' },
-  { id: 'p10', name: '公告查看', category: '运营管理', description: '仅查看公告列表' },
-  { id: 'p11', name: '审批管理', category: '审批流程', description: '处理各类审批申请' },
-  { id: 'p12', name: '系统设置', category: '系统管理', description: '修改系统配置、管理接口设置' },
-];
-
-const groupedPermissions = mockPermissions.reduce((acc, perm) => {
+const groupedPermissions = (seedPermissions as Permission[]).reduce((acc, perm) => {
   if (!acc[perm.category]) acc[perm.category] = [];
   acc[perm.category].push(perm);
   return acc;
 }, {} as Record<string, Permission[]>);
 
 const RolePermission: React.FC = () => {
-  const [roles, setRoles] = useLocalStorageState<Role[]>('hr-admin:roles', mockRoles);
+  const [roles, setRoles] = useLocalStorageState<Role[]>(DEMO_STORAGE_KEYS.roles, seedRoles as Role[]);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -144,7 +121,7 @@ const RolePermission: React.FC = () => {
 
   const stats = [
     { title: '角色总数', value: roles.length.toString(), subText: '个' },
-    { title: '权限总数', value: mockPermissions.length.toString(), subText: '个' },
+    { title: '权限总数', value: seedPermissions.length.toString(), subText: '个' },
     { title: '用户总数', value: roles.reduce((sum, r) => sum + (r.userCount || 0), 0).toLocaleString(), subText: '人' },
     { title: '启用角色', value: roles.filter((r) => r.status !== 'disabled').length.toString(), subText: '个' },
   ];
@@ -209,7 +186,7 @@ const RolePermission: React.FC = () => {
                     <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '6px' }}>权限标签</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                       {role.permissions.slice(0, 4).map((permId, i) => {
-                        const perm = mockPermissions.find((p) => p.id === permId);
+                        const perm = seedPermissions.find((p) => p.id === permId);
                         return <Tag key={i}>{perm ? perm.name : permId}</Tag>;
                       })}
                       {role.permissions.length > 4 && <Tag>+{role.permissions.length - 4}</Tag>}

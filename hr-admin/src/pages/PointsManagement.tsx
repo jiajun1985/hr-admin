@@ -9,60 +9,7 @@ import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
-
-interface EmployeePoints {
-  id: string;
-  name: string;
-  empNo: string;
-  department: string;
-  balance: number;
-  totalIncome: number;
-  totalExpense: number;
-  lastGrantDate: string;
-}
-
-interface PointsRecord {
-  id: string;
-  name: string;
-  empNo: string;
-  recordType: 'grant' | 'deduct' | 'expire';
-  points: number;
-  reason: string;
-  operator: string;
-  createTime: string;
-}
-
-const mockEmployeePoints: EmployeePoints[] = [
-  { id: '1', name: '张伟', empNo: 'EMP001', department: '研发部', balance: 3560, totalIncome: 8200, totalExpense: 4640, lastGrantDate: '2026-04-01' },
-  { id: '2', name: '李娜', empNo: 'EMP002', department: '市场部', balance: 4800, totalIncome: 9000, totalExpense: 4200, lastGrantDate: '2026-04-01' },
-  { id: '3', name: '王强', empNo: 'EMP003', department: '销售部', balance: 2200, totalIncome: 6500, totalExpense: 4300, lastGrantDate: '2026-03-01' },
-  { id: '4', name: '刘芳', empNo: 'EMP004', department: '人事部', balance: 5500, totalIncome: 10200, totalExpense: 4700, lastGrantDate: '2026-04-01' },
-  { id: '5', name: '陈明', empNo: 'EMP005', department: '研发部', balance: 2800, totalIncome: 5600, totalExpense: 2800, lastGrantDate: '2026-02-01' },
-  { id: '6', name: '赵敏', empNo: 'EMP006', department: '财务部', balance: 4100, totalIncome: 7800, totalExpense: 3700, lastGrantDate: '2026-04-01' },
-  { id: '7', name: '孙浩', empNo: 'EMP007', department: '运维部', balance: 1900, totalIncome: 4200, totalExpense: 2300, lastGrantDate: '2026-03-15' },
-  { id: '8', name: '周婷', empNo: 'EMP008', department: '产品部', balance: 3300, totalIncome: 6800, totalExpense: 3500, lastGrantDate: '2026-04-01' },
-  { id: '9', name: '吴昊', empNo: 'EMP009', department: '研发部', balance: 1500, totalIncome: 3000, totalExpense: 1500, lastGrantDate: '2026-01-15' },
-  { id: '10', name: '郑丽', empNo: 'EMP010', department: '市场部', balance: 2600, totalIncome: 4800, totalExpense: 2200, lastGrantDate: '2026-04-01' },
-];
-
-const mockPointsRecords: PointsRecord[] = [
-  { id: '1', name: '张伟', empNo: 'EMP001', recordType: 'grant', points: 1000, reason: '春节福利发放-2026', operator: '系统', createTime: '2026-01-28 10:00' },
-  { id: '2', name: '张伟', empNo: 'EMP001', recordType: 'grant', points: 500, reason: '元宵节福利', operator: '系统', createTime: '2026-02-12 10:00' },
-  { id: '3', name: '李娜', empNo: 'EMP002', recordType: 'grant', points: 1000, reason: '春节福利发放-2026', operator: '系统', createTime: '2026-01-28 10:00' },
-  { id: '4', name: '李娜', empNo: 'EMP002', recordType: 'deduct', points: -800, reason: '积分商城兑换-小米手环8', operator: '系统', createTime: '2026-03-15 14:30' },
-  { id: '5', name: '李娜', empNo: 'EMP002', recordType: 'deduct', points: -400, reason: '积分商城兑换-颈椎按摩仪', operator: '系统', createTime: '2026-04-05 16:20' },
-  { id: '6', name: '王强', empNo: 'EMP003', recordType: 'grant', points: 300, reason: '月度绩效奖励', operator: '管理员', createTime: '2026-04-01 09:00' },
-  { id: '7', name: '王强', empNo: 'EMP003', recordType: 'grant', points: 500, reason: 'Q1季度奖', operator: '管理员', createTime: '2026-03-31 18:00' },
-  { id: '8', name: '刘芳', empNo: 'EMP004', recordType: 'expire', points: -300, reason: '2025年积分到期清零', operator: '系统', createTime: '2026-01-01 00:00' },
-  { id: '9', name: '刘芳', empNo: 'EMP004', recordType: 'grant', points: 1000, reason: '春节福利发放-2026', operator: '系统', createTime: '2026-01-28 10:00' },
-  { id: '10', name: '陈明', empNo: 'EMP005', recordType: 'grant', points: 800, reason: '元宵节福利', operator: '系统', createTime: '2026-02-12 10:00' },
-  { id: '11', name: '陈明', empNo: 'EMP005', recordType: 'deduct', points: -600, reason: '积分商城兑换-空气净化器', operator: '系统', createTime: '2026-03-20 11:00' },
-  { id: '12', name: '赵敏', empNo: 'EMP006', recordType: 'grant', points: 1000, reason: '春节福利发放-2026', operator: '系统', createTime: '2026-01-28 10:00' },
-  { id: '13', name: '孙浩', empNo: 'EMP007', recordType: 'grant', points: 200, reason: '节日活动参与奖励', operator: '管理员', createTime: '2026-04-10 14:00' },
-  { id: '14', name: '周婷', empNo: 'EMP008', recordType: 'grant', points: 500, reason: '端午节预发福利', operator: '系统', createTime: '2026-04-15 10:00' },
-  { id: '15', name: '吴昊', empNo: 'EMP009', recordType: 'grant', points: 500, reason: '新员工入职福利', operator: '管理员', createTime: '2026-01-15 09:00' },
-  { id: '16', name: '郑丽', empNo: 'EMP010', recordType: 'deduct', points: -300, reason: '积分商城兑换-健康体检套餐', operator: '系统', createTime: '2026-04-18 15:30' },
-];
+import { DEMO_STORAGE_KEYS, seedEmployeePoints, seedPointsRecords, type EmployeePoints, type PointsRecord } from '../mockApi/demoData';
 
 const departmentOptions = [
   { label: '研发部', value: '研发部' },
@@ -77,8 +24,8 @@ const departmentOptions = [
 type TabKey = 'employee' | 'records';
 
 const PointsManagement: React.FC = () => {
-  const [employees, setEmployees] = useLocalStorageState<EmployeePoints[]>('hr-admin:points-employees', mockEmployeePoints);
-  const [records, setRecords] = useLocalStorageState<PointsRecord[]>('hr-admin:points-records', mockPointsRecords);
+  const [employees, setEmployees] = useLocalStorageState<EmployeePoints[]>(DEMO_STORAGE_KEYS.employeePoints, seedEmployeePoints);
+  const [records, setRecords] = useLocalStorageState<PointsRecord[]>(DEMO_STORAGE_KEYS.pointsRecords, seedPointsRecords);
   const [activeTab, setActiveTab] = useState<TabKey>('employee');
   const [grantModalOpen, setGrantModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);

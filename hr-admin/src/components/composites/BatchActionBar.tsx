@@ -9,7 +9,7 @@ export interface BatchAction {
   icon?: string;
   type?: 'primary' | 'secondary' | 'danger';
   disabled?: boolean;
-  onClick: (selectedKeys: (string | number)[]) => void;
+  onClick: (selectedKeys: (string | number)[], selectedItems?: Array<{ key: string | number; label: string }>) => void;
 }
 
 interface BatchActionBarProps {
@@ -119,6 +119,8 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
     gap: '8px',
   };
 
+  const selectedKeys = selectedItems.map((item) => item.key);
+
   return (
     <div style={containerStyle}>
       <div style={leftSectionStyle}>
@@ -194,7 +196,7 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
             type={action.type || 'secondary'}
             size="sm"
             disabled={action.disabled}
-            onClick={() => action.onClick([])}
+            onClick={() => action.onClick(selectedKeys, selectedItems)}
           >
             {action.label}
           </Button>

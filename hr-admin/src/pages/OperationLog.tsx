@@ -7,8 +7,8 @@ import { Modal } from '../components/basics/Modal';
 import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
-import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedOperationLogs } from '../mockApi/demoData';
 
 interface OperationLog {
   id: string;
@@ -23,21 +23,8 @@ interface OperationLog {
   duration: number;
 }
 
-const mockLogs: OperationLog[] = [
-  { id: '1', action: '登录系统', module: '系统', operator: 'admin', operatorRole: '超级管理员', ip: '192.168.1.100', status: 'success', detail: '用户成功登录系统', createTime: '2024-04-15 09:30:25', duration: 0 },
-  { id: '2', action: '发放积分', module: '积分管理', operator: 'hr_001', operatorRole: 'HR管理员', ip: '192.168.1.101', status: 'success', detail: '为研发部50名员工发放春节福利积分，人均1000分', createTime: '2024-04-15 10:15:30', duration: 1250 },
-  { id: '3', action: '编辑员工档案', module: '员工管理', operator: 'hr_002', operatorRole: 'HR管理员', ip: '192.168.1.102', status: 'success', detail: '修改员工 EMP001 的部门信息：研发部 → 市场部', createTime: '2024-04-15 11:20:10', duration: 580 },
-  { id: '4', action: '配置保险方案', module: '福利管理', operator: 'hr_001', operatorRole: 'HR管理员', ip: '192.168.1.101', status: 'success', detail: '修改企业版套餐的赔付比例，从80%调整至85%', createTime: '2024-04-15 14:05:45', duration: 3200 },
-  { id: '5', action: '批量导入员工', module: '员工管理', operator: 'hr_003', operatorRole: '运营专员', ip: '192.168.1.103', status: 'failed', detail: '导入失败：第15行数据格式错误，手机号格式不正确', createTime: '2024-04-15 15:30:00', duration: 5600 },
-  { id: '6', action: '发布公告', module: '运营管理', operator: 'hr_004', operatorRole: '运营专员', ip: '192.168.1.104', status: 'success', detail: '发布公告"端午节福利发放公告"，目标：全体员工', createTime: '2024-04-14 09:00:15', duration: 890 },
-  { id: '7', action: '账单支付', module: '财务管理', operator: 'finance_001', operatorRole: '财务管理员', ip: '192.168.1.105', status: 'success', detail: '支付2024年3月账单，金额 ¥486,000', createTime: '2024-04-14 16:30:00', duration: 12000 },
-  { id: '8', action: '删除角色', module: '权限管理', operator: 'admin', operatorRole: '超级管理员', ip: '192.168.1.100', status: 'failed', detail: '删除失败：无法删除系统内置角色"超级管理员"', createTime: '2024-04-13 11:15:00', duration: 150 },
-  { id: '9', action: '修改密码', module: '系统', operator: 'emp_123', operatorRole: '普通员工', ip: '192.168.1.120', status: 'success', detail: '用户自主修改登录密码', createTime: '2024-04-13 14:20:30', duration: 320 },
-  { id: '10', action: '积分兑换', module: '积分管理', operator: 'emp_456', operatorRole: '普通员工', ip: '192.168.1.125', status: 'success', detail: '兑换商品：颈椎按摩仪，消耗积分 500分', createTime: '2024-04-12 18:45:00', duration: 2100 },
-];
-
 const OperationLog: React.FC = () => {
-  const [logs] = useLocalStorageState<OperationLog[]>(DEMO_STORAGE_KEYS.operationLogs, mockLogs);
+  const [logs] = useLocalStorageState<OperationLog[]>(DEMO_STORAGE_KEYS.operationLogs, seedOperationLogs);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<OperationLog | null>(null);
   const [searchValue, setSearchValue] = useState('');

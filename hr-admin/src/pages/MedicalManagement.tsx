@@ -9,52 +9,7 @@ import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
-
-interface MedicalRecord {
-  id: string;
-  name: string;
-  employeeName: string;
-  department: string;
-  company: string;
-  appointmentDate: string;
-  appointmentTime: string;
-  status: 'appointed' | 'checked' | 'cancelled' | 'pending';
-}
-
-interface MedicalPlan {
-  id: string;
-  name: string;
-  year: number;
-  company: string;
-  deadline: string;
-  totalCount: number;
-  appointedCount: number;
-  checkedCount: number;
-  status: 'ongoing' | 'completed' | 'upcoming';
-}
-
-const mockMedicalPlans: MedicalPlan[] = [
-  { id: '1', name: '2026年度全面健康体检', year: 2026, company: '美年大健康', deadline: '2026-06-30', totalCount: 1200, appointedCount: 856, checkedCount: 420, status: 'ongoing' },
-  { id: '2', name: '2026年度高管专项体检', year: 2026, company: '瑞慈体检', deadline: '2026-05-31', totalCount: 50, appointedCount: 50, checkedCount: 35, status: 'ongoing' },
-  { id: '3', name: '2025年度全面健康体检', year: 2025, company: '美年大健康', deadline: '2025-06-30', totalCount: 1150, appointedCount: 1150, checkedCount: 1150, status: 'completed' },
-  { id: '4', name: '2025年度专项体检', year: 2025, company: '爱康国宾', deadline: '2025-08-15', totalCount: 280, appointedCount: 280, checkedCount: 275, status: 'completed' },
-  { id: '5', name: '2026年度肿瘤筛查专项', year: 2026, company: '和睦家医院', deadline: '2026-09-30', totalCount: 300, appointedCount: 0, checkedCount: 0, status: 'upcoming' },
-];
-
-const mockMedicalRecords: MedicalRecord[] = [
-  { id: '1', name: '张伟', employeeName: 'EMP001', department: '研发部', company: '美年大健康', appointmentDate: '2026-04-15', appointmentTime: '14:00', status: 'checked' },
-  { id: '2', name: '李娜', employeeName: 'EMP002', department: '市场部', company: '美年大健康', appointmentDate: '2026-04-18', appointmentTime: '09:00', status: 'checked' },
-  { id: '3', name: '王强', employeeName: 'EMP003', department: '销售部', company: '美年大健康', appointmentDate: '2026-04-20', appointmentTime: '10:00', status: 'appointed' },
-  { id: '4', name: '刘芳', employeeName: 'EMP004', department: '人事部', company: '美年大健康', appointmentDate: '2026-04-25', appointmentTime: '15:00', status: 'appointed' },
-  { id: '5', name: '陈明', employeeName: 'EMP005', department: '研发部', company: '美年大健康', appointmentDate: '2026-04-22', appointmentTime: '11:00', status: 'checked' },
-  { id: '6', name: '赵敏', employeeName: 'EMP006', department: '财务部', company: '美年大健康', appointmentDate: '2026-04-28', appointmentTime: '09:30', status: 'pending' },
-  { id: '7', name: '孙浩', employeeName: 'EMP007', department: '运维部', company: '美年大健康', appointmentDate: '2026-04-30', appointmentTime: '14:30', status: 'pending' },
-  { id: '8', name: '周婷', employeeName: 'EMP008', department: '产品部', company: '美年大健康', appointmentDate: '2026-04-16', appointmentTime: '10:30', status: 'cancelled' },
-  { id: '9', name: '吴昊', employeeName: 'EMP009', department: '研发部', company: '美年大健康', appointmentDate: '2026-05-05', appointmentTime: '09:00', status: 'pending' },
-  { id: '10', name: '郑丽', employeeName: 'EMP010', department: '市场部', company: '美年大健康', appointmentDate: '2026-05-08', appointmentTime: '11:00', status: 'pending' },
-  { id: '11', name: '马超', employeeName: 'EMP011', department: '销售部', company: '瑞慈体检', appointmentDate: '2026-04-10', appointmentTime: '09:00', status: 'checked' },
-  { id: '12', name: '高峰', employeeName: 'EMP013', department: '财务部', company: '瑞慈体检', appointmentDate: '2026-04-12', appointmentTime: '10:00', status: 'checked' },
-];
+import { DEMO_STORAGE_KEYS, seedMedicalPlans, seedMedicalRecords, type MedicalPlan, type MedicalRecord } from '../mockApi/demoData';
 
 const departmentOptions = [
   { label: '研发部', value: '研发部' },
@@ -69,8 +24,8 @@ const departmentOptions = [
 type TabKey = 'plan' | 'list';
 
 const MedicalManagement: React.FC = () => {
-  const [plans, setPlans] = useLocalStorageState<MedicalPlan[]>('hr-admin:medical-plans', mockMedicalPlans);
-  const [records, setRecords] = useLocalStorageState<MedicalRecord[]>('hr-admin:medical-records', mockMedicalRecords);
+  const [plans, setPlans] = useLocalStorageState<MedicalPlan[]>(DEMO_STORAGE_KEYS.medicalPlans, seedMedicalPlans);
+  const [records, setRecords] = useLocalStorageState<MedicalRecord[]>(DEMO_STORAGE_KEYS.medicalRecords, seedMedicalRecords);
   const [activeTab, setActiveTab] = useState<TabKey>('plan');
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [planFormOpen, setPlanFormOpen] = useState(false);

@@ -5,8 +5,13 @@ import { Tag } from '../components/basics/Tag';
 import { Modal } from '../components/basics/Modal';
 import { Icon } from '../components/basics/Icon';
 import { useNavigation } from '../contexts/NavigationContext';
-import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import {
+  DEMO_STORAGE_KEYS,
+  seedAnniversaryEmployees,
+  seedBirthdayEmployees,
+  seedRecognitionCards,
+} from '../mockApi/demoData';
 
 interface BirthdayEmployee {
   id: string;
@@ -26,19 +31,6 @@ interface AnniversaryEmployee {
   sendStatus: 'pending' | 'sent' | 'not_sent';
 }
 
-const mockBirthdayEmployees: BirthdayEmployee[] = [
-  { id: '1', name: '张伟', department: '研发部', birthday: '05-15', daysLeft: 2, sendStatus: 'pending' },
-  { id: '2', name: '李娜', department: '市场部', birthday: '05-18', daysLeft: 5, sendStatus: 'pending' },
-  { id: '3', name: '王强', department: '销售部', birthday: '05-20', daysLeft: 7, sendStatus: 'sent' },
-  { id: '4', name: '刘芳', department: '人事部', birthday: '05-22', daysLeft: 9, sendStatus: 'not_sent' },
-];
-
-const mockAnniversaryEmployees: AnniversaryEmployee[] = [
-  { id: '1', name: '陈明', department: '研发部', entryDate: '2020-05-10', years: 4, sendStatus: 'pending' },
-  { id: '2', name: '赵敏', department: '财务部', entryDate: '2021-05-15', years: 3, sendStatus: 'pending' },
-  { id: '3', name: '孙浩', department: '运维部', entryDate: '2019-05-20', years: 5, sendStatus: 'sent' },
-];
-
 interface RecognitionCard {
   id: string;
   from: string;
@@ -48,12 +40,6 @@ interface RecognitionCard {
   createTime: string;
 }
 
-const mockRecognitionCards: RecognitionCard[] = [
-  { id: '1', from: '张伟', to: '李娜', content: '感谢你在项目中的出色表现！', type: '感谢', createTime: '2024-05-10 14:30' },
-  { id: '2', from: '王强', to: '陈明', content: '技术能力强，帮助团队解决了很多问题', type: '认可', createTime: '2024-05-09 10:00' },
-  { id: '3', from: '刘芳', to: '赵敏', content: '财务工作认真负责，值得学习', type: '感谢', createTime: '2024-05-08 16:20' },
-];
-
 type TabKey = 'birthday' | 'anniversary' | 'recognition';
 type PersistedSetter<T> = (value: T | ((prev: T) => T)) => void;
 
@@ -62,15 +48,15 @@ const EmployeeCare: React.FC = () => {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [birthdayEmployees, setBirthdayEmployees] = useLocalStorageState<BirthdayEmployee[]>(
     DEMO_STORAGE_KEYS.birthdayEmployees,
-    mockBirthdayEmployees
+    seedBirthdayEmployees
   );
   const [anniversaryEmployees, setAnniversaryEmployees] = useLocalStorageState<AnniversaryEmployee[]>(
     DEMO_STORAGE_KEYS.anniversaryEmployees,
-    mockAnniversaryEmployees
+    seedAnniversaryEmployees
   );
   const [recognitionCards] = useLocalStorageState<RecognitionCard[]>(
     DEMO_STORAGE_KEYS.recognitionCards,
-    mockRecognitionCards
+    seedRecognitionCards
   );
   const { currentPage } = useNavigation();
 

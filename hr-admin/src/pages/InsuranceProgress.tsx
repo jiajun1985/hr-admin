@@ -5,8 +5,8 @@ import { Button } from '../components/basics/Button';
 import { Tag } from '../components/basics/Tag';
 import { Modal } from '../components/basics/Modal';
 import { Select } from '../components/basics/Select';
-import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedInsuranceProgress } from '../mockApi/demoData';
 
 interface InsuranceProgressRecord {
   id: string;
@@ -22,117 +22,10 @@ interface InsuranceProgressRecord {
   remark: string;
 }
 
-const mockProgressData: InsuranceProgressRecord[] = [
-  {
-    id: '1',
-    empNo: 'EMP001',
-    name: '张伟',
-    department: '研发部',
-    insurancePlan: '补充医疗保险',
-    insuranceType: '医疗',
-    status: 'insured',
-    submitDate: '2024-01-15',
-    effectiveDate: '2024-02-01',
-    progress: 100,
-    remark: '已生效',
-  },
-  {
-    id: '2',
-    empNo: 'EMP002',
-    name: '李娜',
-    department: '市场部',
-    insurancePlan: '补充医疗保险',
-    insuranceType: '医疗',
-    status: 'underwriting',
-    submitDate: '2024-02-20',
-    effectiveDate: '-',
-    progress: 75,
-    remark: '保险公司审核中',
-  },
-  {
-    id: '3',
-    empNo: 'EMP003',
-    name: '王强',
-    department: '销售部',
-    insurancePlan: '团体意外险',
-    insuranceType: '意外',
-    status: 'submitting',
-    submitDate: '2024-02-25',
-    effectiveDate: '-',
-    progress: 40,
-    remark: '等待员工确认',
-  },
-  {
-    id: '4',
-    empNo: 'EMP004',
-    name: '刘芳',
-    department: '人事部',
-    insurancePlan: '补充医疗保险',
-    insuranceType: '医疗',
-    status: 'pending',
-    submitDate: '-',
-    effectiveDate: '-',
-    progress: 10,
-    remark: '待提交投保资料',
-  },
-  {
-    id: '5',
-    empNo: 'EMP005',
-    name: '陈明',
-    department: '研发部',
-    insurancePlan: '重大疾病险',
-    insuranceType: '重疾',
-    status: 'rejected',
-    submitDate: '2024-01-20',
-    effectiveDate: '-',
-    progress: 60,
-    remark: '既往病史不符合承保条件',
-  },
-  {
-    id: '6',
-    empNo: 'EMP006',
-    name: '赵敏',
-    department: '财务部',
-    insurancePlan: '补充医疗保险',
-    insuranceType: '医疗',
-    status: 'insured',
-    submitDate: '2024-01-18',
-    effectiveDate: '2024-02-01',
-    progress: 100,
-    remark: '已生效',
-  },
-  {
-    id: '7',
-    empNo: 'EMP007',
-    name: '孙浩',
-    department: '运维部',
-    insurancePlan: '团体意外险',
-    insuranceType: '意外',
-    status: 'underwriting',
-    submitDate: '2024-02-22',
-    effectiveDate: '-',
-    progress: 80,
-    remark: '等待保单生成',
-  },
-  {
-    id: '8',
-    empNo: 'EMP008',
-    name: '周婷',
-    department: '产品部',
-    insurancePlan: '补充医疗保险',
-    insuranceType: '医疗',
-    status: 'pending',
-    submitDate: '-',
-    effectiveDate: '-',
-    progress: 5,
-    remark: '待填写投保信息',
-  },
-];
-
 const InsuranceProgress: React.FC = () => {
   const [progressData] = useLocalStorageState<InsuranceProgressRecord[]>(
     DEMO_STORAGE_KEYS.insuranceProgress,
-    mockProgressData
+    seedInsuranceProgress
   );
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<InsuranceProgressRecord | null>(null);

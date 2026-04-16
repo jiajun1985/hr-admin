@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ListPageTemplate } from '../components/composites/ListPageTemplate';
 import { DetailPageTemplate } from '../components/composites/DetailPageTemplate';
 import { type TableColumn } from '../components/composites/DataTable';
@@ -8,8 +8,8 @@ import { Modal } from '../components/basics/Modal';
 import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
-import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedBills } from '../mockApi/demoData';
 
 interface Bill {
   id: string;
@@ -25,16 +25,8 @@ interface Bill {
   paidDate?: string;
 }
 
-const mockBills: Bill[] = [
-  { id: '1', billNo: 'BILL-2024-04-001', period: '2024年4月', companyName: '示例科技公司', insurancePlan: '基础版套餐', employeeCount: 1205, totalAmount: 486000, paidAmount: 486000, status: 'paid', dueDate: '2024-04-30', paidDate: '2024-04-25' },
-  { id: '2', billNo: 'BILL-2024-04-002', period: '2024年4月', companyName: '示例科技公司', insurancePlan: '企业版套餐', employeeCount: 320, totalAmount: 256000, paidAmount: 256000, status: 'paid', dueDate: '2024-04-30', paidDate: '2024-04-28' },
-  { id: '3', billNo: 'BILL-2024-03-003', period: '2024年3月', companyName: '示例科技公司', insurancePlan: '基础版套餐', employeeCount: 1187, totalAmount: 474800, paidAmount: 474800, status: 'paid', dueDate: '2024-03-31', paidDate: '2024-03-28' },
-  { id: '4', billNo: 'BILL-2024-02-004', period: '2024年2月', companyName: '示例科技公司', insurancePlan: '基础版套餐', employeeCount: 1150, totalAmount: 460000, paidAmount: 0, status: 'overdue', dueDate: '2024-02-29' },
-  { id: '5', billNo: 'BILL-2024-01-005', period: '2024年1月', companyName: '示例科技公司', insurancePlan: '基础版套餐', employeeCount: 1100, totalAmount: 440000, paidAmount: 440000, status: 'paid', dueDate: '2024-01-31', paidDate: '2024-01-25' },
-];
-
 const BillManagement: React.FC = () => {
-  const [bills, setBills] = useLocalStorageState<Bill[]>(DEMO_STORAGE_KEYS.bills, mockBills);
+  const [bills, setBills] = useLocalStorageState<Bill[]>(DEMO_STORAGE_KEYS.bills, seedBills);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [searchValue, setSearchValue] = useState('');
@@ -149,12 +141,24 @@ const BillManagement: React.FC = () => {
     },
   ];
 
-  const stats = [
-    { title: '本月应付', value: '742,000', trend: { value: '较上月', direction: 'up' as const, percentage: '+2.3%' }, subText: '2笔账单' },
-    { title: '待支付', value: '0', subText: '无待支付账单' },
-    { title: '已逾期', value: '0', subText: '无逾期账单' },
-    { title: '累计已付', value: '1,656,800', subText: '2024年度' },
-  ];
+  const stats = useMemo(() => {
+    const currentPeriod = bills[0]?.period || '2026年4月';
+    const currentBills = bills.filter((bill) => bill.period === currentPeriod);
+    const currentTotal = currentBills.reduce((sum, bill) => sum + bill.totalAmount, 0);
+    const pending = bills.filter((bill) => bill.status === 'pending');
+    const overdue = bills.filter((bill) => bill.status === 'overdue');
+    const paidTotal = bills.reduce((sum, bill) => sum + bill.paidAmount, 0);
+    return [
+      { title: '本月应付', value: currentTotal.toLocaleString(), trend: { value: currentPeriod, direction: 'neutral' as const }, subText: `${currentBills.length}笔账单` },
+      { title: '待支付', value: String(pending.length), subText: pending.length ? '需要财务处理' : '无待支付账单' },
+      { title: '已逾期', value: String(overdue.length), subText: overdue.length ? '请尽快处理' : '无逾期账单' },
+      { title: '累计已付', value: paidTotal.toLocaleString(), subText: '2026年度' },
+    ];
+  }, [bills]);
+
+  const periodOptions = useMemo(() => {
+    return Array.from(new Set(bills.map((bill) => bill.period))).map((period) => ({ label: period, value: period }));
+  }, [bills]);
 
   const filters = [
     {
@@ -174,10 +178,7 @@ const BillManagement: React.FC = () => {
       buttonType: 'select' as const,
       options: [
         { label: '全部', value: '' },
-        { label: '2024年4月', value: '2024-04' },
-        { label: '2024年3月', value: '2024-03' },
-        { label: '2024年2月', value: '2024-02' },
-        { label: '2024年1月', value: '2024-01' },
+        ...periodOptions,
       ],
     },
   ];
@@ -185,7 +186,7 @@ const BillManagement: React.FC = () => {
   const filteredData = bills.filter((bill) => {
     const matchesSearch = !searchValue || bill.billNo.includes(searchValue) || bill.companyName.includes(searchValue);
     const matchesStatus = !filterValues.status || bill.status === filterValues.status;
-    const matchesPeriod = !filterValues.period || bill.period.includes(filterValues.period);
+    const matchesPeriod = !filterValues.period || bill.period === filterValues.period;
     return matchesSearch && matchesStatus && matchesPeriod;
   });
 

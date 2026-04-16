@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PageHeader } from '../components/composites/PageHeader';
 import { StatCard } from '../components/composites/StatCard';
 import { Tag } from '../components/basics/Tag';
 import { Icon, type IconName } from '../components/basics/Icon';
 import { useNavigation } from '../contexts/NavigationContext';
-import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { DEMO_STORAGE_KEYS, seedInsurancePlans } from '../mockApi/demoData';
 
 interface InsurancePlan {
   id: string;
@@ -23,95 +23,25 @@ interface InsurancePlan {
   status: 'active' | 'pending' | 'expired';
 }
 
-const mockInsurancePlans: InsurancePlan[] = [
-  {
-    id: '1',
-    name: '补充医疗保险',
-    policyNo: 'PA2024001234',
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    payRule: '年付费',
-    scope: '全体正式员工',
-    coreBenefits: [
-      '门急诊报销 (免赔额500，赔付比例80%)',
-      '住院医疗 (免赔额0，赔付比例90%)',
-    ],
-    price: 120000,
-    priceUnit: '年',
-    employeeCount: 1200,
-    dependentCount: 320,
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: '团体意外险',
-    policyNo: 'CP2024005678',
-    startDate: '2024-03-01',
-    endDate: '2025-02-28',
-    payRule: '年付费',
-    scope: '全体在职员工',
-    coreBenefits: [
-      '意外身故/伤残 (保额50万)',
-      '意外医疗 (免赔额100，赔付比例100%)',
-      '住院津贴 (200元/天)',
-    ],
-    price: 48000,
-    priceUnit: '年',
-    employeeCount: 1200,
-    dependentCount: 0,
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: '重大疾病险',
-    policyNo: 'CL2023009876',
-    startDate: '2023-06-01',
-    endDate: '2024-05-31',
-    payRule: '年付费',
-    scope: '全体正式员工',
-    coreBenefits: [
-      '重大疾病 (保额30万，覆盖120种重疾)',
-      '轻症疾病 (保额9万，覆盖40种轻症)',
-    ],
-    price: 96000,
-    priceUnit: '年',
-    employeeCount: 1180,
-    dependentCount: 280,
-    status: 'expired',
-  },
-  {
-    id: '4',
-    name: '门诊补充险',
-    policyNo: 'MZ2024009999',
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    payRule: '月付费',
-    scope: '全体正式员工',
-    coreBenefits: [
-      '普通门诊报销 (免赔额0，赔付比例70%)',
-      '急诊报销 (免赔额0，赔付比例80%)',
-    ],
-    price: 8500,
-    priceUnit: '月',
-    employeeCount: 560,
-    dependentCount: 120,
-    status: 'active',
-  },
-];
-
 const InsurancePlanPage: React.FC = () => {
   const { navigate } = useNavigation();
   const [insurancePlans] = useLocalStorageState<InsurancePlan[]>(
     DEMO_STORAGE_KEYS.insurancePlans,
-    mockInsurancePlans
+    seedInsurancePlans
   );
 
-  const stats = [
-    { title: '生效方案', value: '2', subText: '当前有效' },
-    { title: '投保人数', value: '1,520', subText: '员工 1,200 + 家属 320', trend: { value: '较上月', direction: 'up' as const, percentage: '+0.2%' } },
-    { title: '本月理赔', value: '¥12,560', subText: '共 8 笔', trend: { value: '较上月', direction: 'down' as const, percentage: '-15.2%' } },
-    { title: '本年保费', value: '¥264,000', subText: '累计支出' },
-  ];
+  const stats = useMemo(() => {
+    const activePlans = insurancePlans.filter((plan) => plan.status === 'active');
+    const insuredEmployees = activePlans.reduce((sum, plan) => sum + plan.employeeCount, 0);
+    const dependents = activePlans.reduce((sum, plan) => sum + plan.dependentCount, 0);
+    const premium = insurancePlans.reduce((sum, plan) => sum + plan.price, 0);
+    return [
+      { title: '生效方案', value: String(activePlans.length), subText: '当前有效' },
+      { title: '投保人数', value: String(insuredEmployees + dependents), subText: `员工 ${insuredEmployees} + 家属 ${dependents}` },
+      { title: '本月理赔', value: '¥12,560', subText: '2026年4月共 8 笔', trend: { value: '较上月', direction: 'down' as const, percentage: '-15.2%' } },
+      { title: '本年保费', value: `¥${premium.toLocaleString()}`, subText: '2026年度累计' },
+    ];
+  }, [insurancePlans]);
 
   const getStatusConfig = (status: InsurancePlan['status']) => {
     const config = {

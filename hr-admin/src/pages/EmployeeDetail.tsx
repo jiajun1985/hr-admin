@@ -7,17 +7,9 @@ import { DataTable, type TableColumn } from '../components/composites/DataTable'
 import { useNavigation } from '../contexts/NavigationContext';
 import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { seedEmployees } from '../mockApi/employeeSeedData';
 
-const mockEmployeesData = [
-  { id: '1', empNo: 'EMP001', name: '张伟', avatar: null, department: '研发部', position: '高级前端工程师', gender: '男', phone: '138****8001', email: 'zhangwei@company.com', idCard: '110***********2345', status: 'active', entryDate: '2021-05-10', birthday: '1995-08-15', education: '本科', graduateSchool: '北京大学' },
-  { id: '2', empNo: 'EMP002', name: '李娜', avatar: null, department: '市场部', position: '市场经理', gender: '女', phone: '139****8002', email: 'lina@company.com', idCard: '120***********6789', status: 'active', entryDate: '2022-03-15', birthday: '1992-06-20', education: '硕士', graduateSchool: '清华大学' },
-  { id: '3', empNo: 'EMP003', name: '王强', avatar: null, department: '销售部', position: '销售主管', gender: '男', phone: '137****8003', email: 'wangqiang@company.com', idCard: '130***********3456', status: 'active', entryDate: '2020-08-20', birthday: '1990-12-05', education: '本科', graduateSchool: '复旦大学' },
-  { id: '4', empNo: 'EMP004', name: '刘芳', avatar: null, department: '人事部', position: 'HR专员', gender: '女', phone: '136****8004', email: 'liufang@company.com', idCard: '140***********7890', status: 'inactive', entryDate: '2019-12-01', birthday: '1994-03-18', education: '本科', graduateSchool: '中国人民大学' },
-  { id: '5', empNo: 'EMP005', name: '陈明', avatar: null, department: '研发部', position: 'Java开发工程师', gender: '男', phone: '135****8005', email: 'chenming@company.com', idCard: '150***********1234', status: 'active', entryDate: '2023-01-08', birthday: '1996-09-10', education: '本科', graduateSchool: '浙江大学' },
-  { id: '6', empNo: 'EMP006', name: '赵敏', avatar: null, department: '财务部', position: '财务会计', gender: '女', phone: '134****8006', email: 'zhaomin@company.com', idCard: '160***********5678', status: 'active', entryDate: '2022-06-20', birthday: '1993-11-25', education: '本科', graduateSchool: '上海交通大学' },
-  { id: '7', empNo: 'EMP007', name: '孙浩', avatar: null, department: '运维部', position: '运维工程师', gender: '男', phone: '133****8007', email: 'sunhao@company.com', idCard: '170***********9012', status: 'inactive', entryDate: '2021-11-15', birthday: '1991-07-30', education: '本科', graduateSchool: '南京大学' },
-  { id: '8', empNo: 'EMP008', name: '周婷', avatar: null, department: '产品部', position: '产品经理', gender: '女', phone: '132****8008', email: 'zhouting@company.com', idCard: '180***********3456', status: 'active', entryDate: '2023-02-28', birthday: '1997-02-14', education: '硕士', graduateSchool: '中国科学技术大学' },
-];
+const mockEmployeesData = seedEmployees;
 
 const getMockEmployee = (employeeId?: string, employees = mockEmployeesData) => {
   if (!employeeId) return employees[0] || mockEmployeesData[0];
@@ -27,19 +19,19 @@ const getMockEmployee = (employeeId?: string, employees = mockEmployeesData) => 
 };
 
 const mockInsurance = [
-  { id: '1', name: '补充医疗保险', status: 'active', company: '平安保险', policyNo: 'PA2024001234', startDate: '2024-01-01', amount: '2万/年' },
-  { id: '2', name: '意外险', status: 'pending', company: '太平洋保险', policyNo: 'CP2024005678', startDate: '2024-03-01', amount: '10万/年' },
+  { id: '1', name: '补充医疗保险', status: 'active', company: '平安保险', policyNo: 'PA2026001234', startDate: '2026-01-01', amount: '2万/年' },
+  { id: '2', name: '意外险', status: 'pending', company: '太平洋保险', policyNo: 'CP2026005678', startDate: '2026-03-01', amount: '10万/年' },
 ];
 
 const mockClaims = [
-  { id: '1', date: '2024-03-15', type: '门诊', amount: 320, status: '已赔付' },
-  { id: '2', date: '2024-01-20', type: '住院', amount: 5000, status: '已赔付' },
+  { id: '1', date: '2026-03-15', type: '门诊', amount: 320, status: '已赔付' },
+  { id: '2', date: '2026-01-20', type: '住院', amount: 5000, status: '已赔付' },
 ];
 
 const mockMedical = {
-  current: '2024年度全面体检',
+  current: '2026年度全面体检',
   company: '美年大健康',
-  appointment: '2024-05-20 14:00',
+  appointment: '2026-05-20 14:00',
   status: '已预约',
   rate: 67,
 };
@@ -51,8 +43,8 @@ const mockPoints = {
 };
 
 const mockOrders = [
-  { id: '1', orderNo: 'ORD20240315001', product: '颈椎按摩仪', points: -500, date: '2024-03-15', status: '已完成' },
-  { id: '2', orderNo: 'ORD20240310002', product: '电影票×2', points: -80, date: '2024-03-10', status: '已完成' },
+  { id: '1', orderNo: 'ORD20260315001', product: '颈椎按摩仪', points: -500, date: '2026-03-15', status: '已完成' },
+  { id: '2', orderNo: 'ORD20260310002', product: '电影票×2', points: -80, date: '2026-03-10', status: '已完成' },
 ];
 
 const EmployeeDetail: React.FC = () => {
@@ -125,7 +117,7 @@ const EmployeeDetail: React.FC = () => {
         <InfoRow label="工号" value={mockEmployee.empNo} />
         <InfoRow label="入职" value={mockEmployee.entryDate} />
         <InfoRow label="手机" value={mockEmployee.phone} />
-        <InfoRow label="邮箱" value={mockEmployee.email} />
+        <InfoRow label="邮箱" value={mockEmployee.email || '-'} />
       </div>
 
       <div style={{ borderTop: '1px solid var(--gray-200)', paddingTop: '16px', marginBottom: '16px' }}>
@@ -161,16 +153,16 @@ const EmployeeDetail: React.FC = () => {
               <InfoGrid items={[
                 { label: '姓名', value: mockEmployee.name },
                 { label: '性别', value: mockEmployee.gender },
-                { label: '生日', value: mockEmployee.birthday },
-                { label: '学历', value: mockEmployee.education },
-                { label: '毕业院校', value: mockEmployee.graduateSchool },
-                { label: '证件号', value: mockEmployee.idCard },
+                { label: '生日', value: mockEmployee.birthday || '-' },
+                { label: '学历', value: mockEmployee.education || '-' },
+                { label: '毕业院校', value: mockEmployee.graduateSchool || '-' },
+                { label: '证件号', value: mockEmployee.idCard || '-' },
               ]} />
             </Section>
             <Section title="联系信息">
               <InfoGrid items={[
                 { label: '手机号', value: mockEmployee.phone },
-                { label: '邮箱', value: mockEmployee.email },
+                { label: '邮箱', value: mockEmployee.email || '-' },
               ]} />
             </Section>
             <Section title="工作信息">

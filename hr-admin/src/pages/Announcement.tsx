@@ -8,32 +8,7 @@ import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
-
-interface AnnouncementItem {
-  id: string;
-  title: string;
-  content: string;
-  type: 'notice' | 'activity' | 'policy';
-  targetScope: string;
-  publishTime: string;
-  publisher: string;
-  status: 'published' | 'draft' | 'scheduled';
-  readCount: number;
-  viewCount: number;
-}
-
-const mockAnnouncements: AnnouncementItem[] = [
-  { id: '1', title: '2026年度员工健康体检预约通知', content: '公司将于4-6月份组织年度员工体检，本次体检新增肿瘤筛查项目，请各部门同事提前在系统内预约体检时间，预约截止日期为4月30日。体检当天请携带身份证空腹前往。', type: 'notice', targetScope: '全体员工', publishTime: '2026-04-01 09:00', publisher: '人事部-刘芳', status: 'published', readCount: 1156, viewCount: 1240 },
-  { id: '2', title: '端午节福利礼包领取公告', content: '端午佳节将至，公司为全体员工准备了节日礼品大礼包，包含粽子礼盒、坚果礼盒和水果礼券。请各部门于6月5日前到前台领取，领取时需签字确认。', type: 'activity', targetScope: '全体员工', publishTime: '2026-04-08 14:30', publisher: '福利运营-张三', status: 'published', readCount: 1180, viewCount: 1205 },
-  { id: '3', title: '商业补充医疗保险升级说明', content: '为更好地保障员工健康，公司决定自6月1日起升级商业补充医疗保险计划。新计划增加了门诊报销比例（从60%提升至80%），同时新增牙科保健福利。详情请见附件。', type: 'policy', targetScope: '全体员工', publishTime: '2026-04-05 10:00', publisher: '福利运营-李四', status: 'published', readCount: 892, viewCount: 980 },
-  { id: '4', title: '积分商城春季新品上架', content: '积分商城春季新品已上架！本次新品包括：华为智能手环、小米空气净化器、颈椎按摩仪、健康体检套餐等。会员积分可抵用部分金额，优惠多多，先到先得！', type: 'activity', targetScope: '全体员工', publishTime: '2026-04-10 16:00', publisher: '福利运营-张三', status: 'published', readCount: 756, viewCount: 820 },
-  { id: '5', title: '员工生日会活动通知（4月场）', content: '本月员工生日会将于4月25日下午3点在多功能厅举行，届时将为4月生日的同事送上祝福和精美礼品。邀请各部门同事积极参与，共同庆祝！', type: 'activity', targetScope: '全体员工', publishTime: '2026-04-12 11:00', publisher: '企业文化部-王五', status: 'published', readCount: 645, viewCount: 720 },
-  { id: '6', title: '2026年高温补贴发放标准', content: '根据政府相关规定，公司将于6-9月为员工发放高温补贴。室外作业人员补贴标准为每月300元，室内人员为每月150元。补贴将与当月工资一并发放。', type: 'policy', targetScope: '全体员工', publishTime: '2026-04-15 09:00', publisher: '人事部-刘芳', status: 'published', readCount: 520, viewCount: 580 },
-  { id: '7', title: '员工下午茶福利升级公告', content: '为提升员工福利体验，自下周起公司下午茶福利升级，由原来每周两次增加为每周三次。周一、周三、周五下午3点准时供应，欢迎大家享用！', type: 'activity', targetScope: '全体员工', publishTime: '2026-04-18 14:00', publisher: '行政部-赵六', status: 'published', readCount: 890, viewCount: 960 },
-  { id: '8', title: '五一小长假安全须知', content: '五一假期将至，请各部门做好安全检查。假期期间公司将对办公区域进行断电处理。如有紧急事务需要处理，请提前与行政部联系。祝你假期愉快！', type: 'notice', targetScope: '全体员工', publishTime: '2026-04-20 11:00', publisher: '行政部-赵六', status: 'scheduled', readCount: 0, viewCount: 0 },
-  { id: '9', title: '中秋节福利方案征集', content: '为更好地了解员工需求，现征集中秋节福利方案建议。欢迎大家踊跃投票，选择您心仪的福利组合。投票截止日期为5月15日。', type: 'activity', targetScope: '全体员工', publishTime: '2026-04-22 10:00', publisher: '福利运营-张三', status: 'draft', readCount: 0, viewCount: 0 },
-  { id: '10', title: '年终奖发放时间预告', content: '根据公司年度奖金制度，2025年年终奖将于2026年1月15日随当月工资一同发放。请各位同事注意查收，如有疑问可咨询财务部。', type: 'notice', targetScope: '全体员工', publishTime: '2026-04-25 09:00', publisher: '财务部-赵敏', status: 'draft', readCount: 0, viewCount: 0 },
-];
+import { DEMO_STORAGE_KEYS, seedAnnouncements, type Announcement as AnnouncementItem } from '../mockApi/demoData';
 
 const emptyForm = {
   title: '',
@@ -44,7 +19,7 @@ const emptyForm = {
 };
 
 const Announcement: React.FC = () => {
-  const [data, setData] = useLocalStorageState<AnnouncementItem[]>('hr-admin:announcements', mockAnnouncements);
+  const [data, setData] = useLocalStorageState<AnnouncementItem[]>(DEMO_STORAGE_KEYS.announcements, seedAnnouncements);
   const [searchValue, setSearchValue] = useState('');
   const [filterValues, setFilterValues] = useState<Record<string, any>>({});
   const [formModalOpen, setFormModalOpen] = useState(false);
