@@ -7,6 +7,7 @@ import { Modal } from '../components/basics/Modal';
 import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
+import { TableText } from '../components/basics/TableText';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedOperationLogs } from '../mockApi/demoData';
 
@@ -58,7 +59,7 @@ const OperationLog: React.FC = () => {
       title: 'IP地址',
       width: 130,
       dataIndex: 'ip',
-      render: (value) => <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{value}</span>,
+      render: (value) => <TableText>{value}</TableText>,
     },
     {
       key: 'status',
@@ -95,9 +96,9 @@ const OperationLog: React.FC = () => {
       dataIndex: 'duration',
       align: 'right',
       render: (value) => (
-        <span style={{ fontSize: '12px', color: 'var(--gray-500)' }}>
+        <TableText align="right" tone="muted" style={{ fontSize: '12px' }}>
           {value === 0 ? '-' : `${value}ms`}
-        </span>
+        </TableText>
       ),
     },
     {
@@ -231,7 +232,7 @@ const OperationLog: React.FC = () => {
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '4px' }}>IP地址</div>
-                <div style={{ fontSize: '14px', fontFamily: 'monospace', color: 'var(--gray-800)' }}>{selectedLog.ip}</div>
+                <TableText tone="strong" style={{ fontSize: '14px' }}>{selectedLog.ip}</TableText>
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '4px' }}>执行耗时</div>

@@ -8,6 +8,7 @@ import { Modal } from '../components/basics/Modal';
 import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
+import { TableText } from '../components/basics/TableText';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedBills } from '../mockApi/demoData';
 
@@ -51,9 +52,7 @@ const BillManagement: React.FC = () => {
       title: '账单编号',
       width: 180,
       dataIndex: 'billNo',
-      render: (value) => (
-        <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{value}</span>
-      ),
+      render: (value) => <TableText>{value}</TableText>,
     },
     {
       key: 'period',
@@ -82,9 +81,9 @@ const BillManagement: React.FC = () => {
       dataIndex: 'totalAmount',
       align: 'right',
       render: (value) => (
-        <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--gray-800)' }}>
+        <TableText align="right" tone="strong" style={{ fontSize: '16px', fontWeight: 600 }}>
           ¥{value.toLocaleString()}
-        </span>
+        </TableText>
       ),
     },
     {
@@ -94,9 +93,13 @@ const BillManagement: React.FC = () => {
       dataIndex: 'paidAmount',
       align: 'right',
       render: (value, record) => (
-        <span style={{ color: value === record.totalAmount ? 'var(--success-600)' : 'var(--warning-600)' }}>
+        <TableText
+          align="right"
+          tone={value === record.totalAmount ? 'strong' : 'default'}
+          style={{ color: value === record.totalAmount ? 'var(--success-600)' : 'var(--warning-600)' }}
+        >
           ¥{value.toLocaleString()}
-        </span>
+        </TableText>
       ),
     },
     {
@@ -248,7 +251,7 @@ const BillManagement: React.FC = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', marginBottom: '24px' }}>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '4px' }}>账单编号</div>
-                <div style={{ fontSize: '14px', fontWeight: 500, fontFamily: 'monospace' }}>{selectedBill.billNo}</div>
+                <TableText tone="strong" style={{ fontSize: '14px', fontWeight: 500 }}>{selectedBill.billNo}</TableText>
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '4px' }}>账单周期</div>

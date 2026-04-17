@@ -7,6 +7,7 @@ import { Modal } from '../components/basics/Modal';
 import { Input } from '../components/basics/Input';
 import { Select } from '../components/basics/Select';
 import { Icon } from '../components/basics/Icon';
+import { TableText } from '../components/basics/TableText';
 import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { seedEmployees } from '../mockApi/employeeSeedData';
@@ -45,30 +46,6 @@ const getEmploymentStatusMeta = (employee: Employee, currentDate: string) => {
   return { label: '在职', color: 'success' as const };
 };
 
-const tableCellContentStyle: React.CSSProperties = {
-  minHeight: '22px',
-  display: 'flex',
-  alignItems: 'center',
-};
-
-const centeredCellContentStyle: React.CSSProperties = {
-  ...tableCellContentStyle,
-  justifyContent: 'center',
-};
-
-const latinCellStyle: React.CSSProperties = {
-  ...tableCellContentStyle,
-  fontFamily:
-    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
-  fontVariantNumeric: 'tabular-nums lining-nums',
-  letterSpacing: 0,
-};
-
-const centeredLatinCellStyle: React.CSSProperties = {
-  ...latinCellStyle,
-  justifyContent: 'center',
-};
-
 const renderDepartmentTag = (value: string) => {
   if (value === '未分配') {
     return (
@@ -99,8 +76,8 @@ const emptyForm: Omit<Employee, 'id' | 'empNo'> & { empNo?: string } = {
   name: '',
   department: '',
   position: '',
-  gender: '男',
-  idType: '身份证',
+  gender: '',
+  idType: '',
   idCard: '',
   phone: '',
   status: 'active',
@@ -138,8 +115,8 @@ const EmployeeList: React.FC = () => {
       name: record.name,
       department: record.department,
       position: record.position,
-      gender: record.gender,
-      idType: record.idType ?? '身份证',
+      gender: record.gender ?? '',
+      idType: record.idType ?? '',
       idCard: record.idCard ?? '',
       phone: record.phone,
       status: record.status,
@@ -313,7 +290,7 @@ const EmployeeList: React.FC = () => {
       align: 'center',
       minWidth: 92,
       dataIndex: 'empNo',
-      render: (value) => <span style={centeredLatinCellStyle}>{value}</span>,
+      render: (value) => <TableText align="center">{value}</TableText>,
     },
     {
       key: 'name',
@@ -330,7 +307,11 @@ const EmployeeList: React.FC = () => {
       align: 'center',
       minWidth: 96,
       dataIndex: 'department',
-      render: (value) => <div style={centeredCellContentStyle}>{renderDepartmentTag(String(value))}</div>,
+      render: (value) => (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '22px' }}>
+          {renderDepartmentTag(String(value))}
+        </div>
+      ),
     },
     { key: 'gender', title: '性别', align: 'center', minWidth: 56, dataIndex: 'gender' },
     {
@@ -339,7 +320,7 @@ const EmployeeList: React.FC = () => {
       align: 'center',
       minWidth: 100,
       dataIndex: 'idType',
-      render: (value) => <div style={centeredCellContentStyle}>{value || '—'}</div>,
+      render: (value) => <TableText align="center">{value || '—'}</TableText>,
     },
     {
       key: 'idCard',
@@ -347,7 +328,7 @@ const EmployeeList: React.FC = () => {
       align: 'center',
       minWidth: 168,
       dataIndex: 'idCard',
-      render: (value) => <div style={centeredLatinCellStyle}>{value || '—'}</div>,
+      render: (value) => <TableText align="center">{value || '—'}</TableText>,
     },
     {
       key: 'phone',
@@ -355,7 +336,7 @@ const EmployeeList: React.FC = () => {
       align: 'center',
       minWidth: 120,
       dataIndex: 'phone',
-      render: (value) => <span style={centeredLatinCellStyle}>{value}</span>,
+      render: (value) => <TableText align="center">{value}</TableText>,
     },
     {
       key: 'employmentStatus',
@@ -407,7 +388,7 @@ const EmployeeList: React.FC = () => {
       align: 'center',
       minWidth: 96,
       dataIndex: 'entryDate',
-      render: (value) => <span style={centeredLatinCellStyle}>{value}</span>,
+      render: (value) => <TableText align="center">{value}</TableText>,
     },
     {
       key: 'leaveDate',
@@ -416,9 +397,9 @@ const EmployeeList: React.FC = () => {
       minWidth: 88,
       dataIndex: 'leaveDate',
       render: (value) => (
-        <span style={{ ...centeredLatinCellStyle, color: value ? 'var(--gray-600)' : 'var(--gray-400)' }}>
+        <TableText align="center" tone={value ? 'default' : 'muted'}>
           {formatEmptyDate(value as string)}
-        </span>
+        </TableText>
       ),
     },
   ];

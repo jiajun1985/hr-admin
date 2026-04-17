@@ -7,6 +7,7 @@ import { Modal } from '../components/basics/Modal';
 import { Tag } from '../components/basics/Tag';
 import { Icon } from '../components/basics/Icon';
 import { Select } from '../components/basics/Select';
+import { TableText } from '../components/basics/TableText';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedDepartments, seedEmployees } from '../mockApi/demoData';
@@ -545,6 +546,7 @@ const DepartmentPage: React.FC = () => {
     }
 
     const oldDept = transferEmployee.department;
+    const shouldClearManager = selectedDepartment?.manager === transferEmployee.name;
     setEmployees((prev) =>
       prev.map((emp) =>
         emp.id === transferEmployee.id ? { ...emp, department: targetDept.name } : emp
@@ -554,6 +556,13 @@ const DepartmentPage: React.FC = () => {
       setDepartments((prev) => updateNodeEmployeeCount(prev, oldDept, -1));
     }
     setDepartments((prev) => updateNodeEmployeeCount(prev, targetDept.name, 1));
+    if (shouldClearManager && selectedDepartment) {
+      setDepartments((prev) => updateNode(prev, selectedDepartment.id, {
+        manager: '-',
+        managerPhone: '-',
+      }));
+      setSelectedDepartment((prev) => (prev ? { ...prev, manager: '-', managerPhone: '-' } : prev));
+    }
     setTransferModalOpen(false);
     setTransferEmployeeId('');
     setTransferTargetId('');
@@ -624,7 +633,7 @@ const DepartmentPage: React.FC = () => {
       align: 'center',
       minWidth: 96,
       dataIndex: 'empNo',
-      render: (value) => <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace', fontVariantNumeric: 'tabular-nums lining-nums', letterSpacing: 0 }}>{value}</span>,
+      render: (value) => <TableText align="center">{value}</TableText>,
     },
     {
       key: 'name',
@@ -659,13 +668,7 @@ const DepartmentPage: React.FC = () => {
       align: 'center',
       minWidth: 100,
       dataIndex: 'entryDate',
-      render: (value) => (
-        <span style={{
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
-          fontVariantNumeric: 'tabular-nums lining-nums',
-          letterSpacing: 0,
-        }}>{value || '—'}</span>
-      ),
+      render: (value) => <TableText align="center">{value || '—'}</TableText>,
     },
     {
       key: 'employmentStatus',
@@ -1062,7 +1065,7 @@ const DepartmentPage: React.FC = () => {
           </div>
           {selectedDepartment && selectedDepartment.manager && selectedDepartment.manager !== '-' && (
             <div style={{ marginTop: '12px', padding: '12px', backgroundColor: 'var(--warning-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--warning-600)' }}>
-              原负责人「{selectedDepartment.manager}」将被替换
+              原负责人「{selectedDepartment.manager}」将不再担任负责人
             </div>
           )}
         </div>

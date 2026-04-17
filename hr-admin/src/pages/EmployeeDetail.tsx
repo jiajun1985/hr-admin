@@ -3,6 +3,7 @@ import { DetailPageTemplate, type TabItem } from '../components/composites/Detai
 import { Button } from '../components/basics/Button';
 import { Tag } from '../components/basics/Tag';
 import { Icon } from '../components/basics/Icon';
+import { TableText } from '../components/basics/TableText';
 import { DataTable, type TableColumn } from '../components/composites/DataTable';
 import { useNavigation } from '../contexts/NavigationContext';
 import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
@@ -66,7 +67,7 @@ const EmployeeDetail: React.FC = () => {
   const insuranceColumns: TableColumn<typeof mockInsurance[0]>[] = [
     { key: 'name', title: '方案名称', dataIndex: 'name' },
     { key: 'company', title: '保险公司', dataIndex: 'company' },
-    { key: 'policyNo', title: '保单号', dataIndex: 'policyNo', render: (v) => <span style={{ fontFamily: 'monospace' }}>{v}</span> },
+    { key: 'policyNo', title: '保单号', dataIndex: 'policyNo', render: (v) => <TableText>{v}</TableText> },
     { key: 'amount', title: '保额', dataIndex: 'amount', align: 'right' },
     { key: 'status', title: '状态', dataIndex: 'status', render: (v) => <Tag color={v === 'active' ? 'success' : 'warning'}>{v === 'active' ? '保障中' : '处理中'}</Tag> },
   ];
@@ -79,7 +80,7 @@ const EmployeeDetail: React.FC = () => {
   ];
 
   const orderColumns: TableColumn<typeof mockOrders[0]>[] = [
-    { key: 'orderNo', title: '订单号', dataIndex: 'orderNo', render: (v) => <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{v}</span> },
+    { key: 'orderNo', title: '订单号', dataIndex: 'orderNo', render: (v) => <TableText>{v}</TableText> },
     { key: 'product', title: '商品', dataIndex: 'product' },
     { key: 'points', title: '积分', dataIndex: 'points', align: 'right', render: (v) => <span style={{ color: v < 0 ? 'var(--error-600)' : 'var(--success-600)' }}>{v}</span> },
     { key: 'date', title: '兑换日期', dataIndex: 'date' },
@@ -313,7 +314,7 @@ const EmployeeDetail: React.FC = () => {
         </div>
         <div>
           <div style={{ color: 'var(--gray-400)', marginBottom: '2px' }}>保单号</div>
-          <div style={{ color: 'var(--gray-600)', fontFamily: 'monospace' }}>{data.policyNo}</div>
+          <TableText tone="default">{data.policyNo}</TableText>
         </div>
         <div>
           <div style={{ color: 'var(--gray-400)', marginBottom: '2px' }}>生效日</div>

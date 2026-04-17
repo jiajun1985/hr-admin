@@ -22,3 +22,4 @@ export { Icon } from './Icon';
 export type { IconName } from './Icon';
 
 export { Checkbox } from './Checkbox';
+export { TableText } from './TableText';
