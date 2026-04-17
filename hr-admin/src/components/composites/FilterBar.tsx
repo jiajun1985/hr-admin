@@ -71,27 +71,27 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   const filterRowStyle: React.CSSProperties = {
-    display: 'flex',
+    display: 'grid',
+    gridAutoFlow: 'column',
+    gridAutoColumns: 'max-content',
     alignItems: 'center',
-    gap: '12px',
-    flexWrap: 'wrap',
-  };
-
-  const searchStyle: React.CSSProperties = {
-    width: '240px',
+    gap: '16px',
+    justifyContent: 'start',
   };
 
   const filterItemStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: hideLabels ? '0' : '8px',
-    minWidth: '140px',
+    minWidth: '0',
+    flex: '0 0 auto',
   };
 
   const filterLabelStyle: React.CSSProperties = {
     fontSize: '13px',
     color: 'var(--gray-500)',
     whiteSpace: 'nowrap',
+    lineHeight: 1,
   };
 
   const actionGroupStyle: React.CSSProperties = {
@@ -135,15 +135,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
       <div style={containerStyle}>
         <div style={filterRowStyle}>
-          <div style={searchStyle}>
-            <Input
-              prefix={<Icon name="search" size={14} />}
-              placeholder={searchPlaceholder}
-              value={searchValue}
-              onChange={(e) => handleSearch(e.target.value)}
-              contentColor="var(--gray-500)"
-            />
-          </div>
+          <Input
+            prefix={<Icon name="search" size={14} />}
+            placeholder={searchPlaceholder}
+            value={searchValue}
+            onChange={(e) => handleSearch(e.target.value)}
+            contentColor="var(--gray-500)"
+            style={{ width: '248px' }}
+          />
 
           {filters.map((filter) => (
             <div key={filter.key} style={filterItemStyle}>
@@ -154,7 +153,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   value={filterValues[filter.key]}
                   onChange={(value) => onFilterChange?.(filter.key, value)}
                   placeholder={filter.placeholder || (hideLabels ? filter.label : '全部')}
-                  style={{ width: '120px' }}
+                  style={{ width: '128px' }}
                   contentColor="var(--gray-500)"
                 />
               )}
@@ -163,7 +162,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   placeholder={filter.placeholder || (hideLabels ? filter.label : undefined)}
                   value={filterValues[filter.key] as string}
                   onChange={(e) => onFilterChange?.(filter.key, e.target.value)}
-                  style={{ width: '120px' }}
+                  style={{ width: '128px' }}
                   contentColor="var(--gray-500)"
                 />
               )}

@@ -154,6 +154,7 @@ export const Select: React.FC<SelectProps> = ({
     borderRadius: 'var(--radius-sm)',
     cursor: disabled ? 'not-allowed' : 'pointer',
     fontSize: sizeStyles[size].fontSize,
+    fontWeight: 400,
     color: contentColor || (getSelectedLabels() ? 'var(--gray-800)' : 'var(--gray-300)'),
     boxShadow: isOpen ? '0 0 0 3px rgba(249, 115, 22, 0.1)' : 'none',
     transition: 'all 0.15s ease',
@@ -180,6 +181,7 @@ export const Select: React.FC<SelectProps> = ({
     height: '36px',
     padding: '0 12px',
     fontSize: sizeStyles[size].fontSize,
+    fontWeight: 400,
     color: disabled ? 'var(--gray-300)' : selected ? 'var(--primary-600)' : 'var(--gray-600)',
     backgroundColor: selected ? 'var(--primary-50)' : 'transparent',
     cursor: disabled ? 'not-allowed' : 'pointer',
@@ -192,7 +194,7 @@ export const Select: React.FC<SelectProps> = ({
         style={triggerStyle}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, fontWeight: 400 }}>
           {getSelectedLabels() || placeholder}
         </span>
         <Icon
