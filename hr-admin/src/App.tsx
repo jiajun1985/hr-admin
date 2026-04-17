@@ -13,6 +13,8 @@ import Department from './pages/Department';
 import InsurancePlan from './pages/InsurancePlan';
 import InsuranceSchemeDetail from './pages/InsuranceSchemeDetail';
 import InsuranceProgress from './pages/InsuranceProgress';
+import ClaimProgress from './pages/ClaimProgress';
+import InsuranceData from './pages/InsuranceData';
 import MedicalManagement from './pages/MedicalManagement';
 import PointsManagement from './pages/PointsManagement';
 import EmployeeCare from './pages/EmployeeCare';
@@ -31,8 +33,8 @@ const implementedPages: Record<PageKey, React.ComponentType | undefined> = {
   'insurance-plan': InsurancePlan,
   'insurance-scheme-detail': InsuranceSchemeDetail,
   'insurance-progress': InsuranceProgress,
-  'claim-progress': undefined,
-  'insurance-data': undefined,
+  'claim-progress': ClaimProgress,
+  'insurance-data': InsuranceData,
   'medical-plan': MedicalManagement,
   'medical-list': undefined,
   'medical-data': undefined,

@@ -13,6 +13,7 @@ export const DEMO_STORAGE_KEYS = {
   interfaceModules: 'interface-modules',
   insurancePlans: 'insurance-plans',
   insuranceProgress: 'insurance-progress',
+  insuranceClaims: 'insurance-claims',
   insuredPersons: 'insured-persons',
   insuranceOperationRecords: 'operation-records',
   insuranceMaterials: 'insurance-materials',

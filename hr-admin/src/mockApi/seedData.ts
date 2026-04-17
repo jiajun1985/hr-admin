@@ -1,5 +1,6 @@
 import type {
   Department,
+  InsuranceClaimRecord,
   InsurancePlan,
   InsuranceProgressRecord,
   InsuredPerson,
@@ -126,6 +127,15 @@ export const seedInsuranceProgress: InsuranceProgressRecord[] = [
   { id: '6', empNo: 'EMP006', name: '赵敏', department: '财务部', insurancePlan: '补充医疗保险', insuranceType: '医疗', status: 'insured', submitDate: '2026-01-18', effectiveDate: '2026-02-01', progress: 100, remark: '已生效' },
   { id: '7', empNo: 'EMP007', name: '孙浩', department: '研发部', insurancePlan: '团体意外险', insuranceType: '意外', status: 'underwriting', submitDate: '2026-04-01', effectiveDate: '-', progress: 80, remark: '等待保单生成' },
   { id: '8', empNo: 'EMP008', name: '周婷', department: '研发部', insurancePlan: '补充医疗保险', insuranceType: '医疗', status: 'pending', submitDate: '-', effectiveDate: '-', progress: 5, remark: '待填写投保信息' },
+];
+
+export const seedInsuranceClaims: InsuranceClaimRecord[] = [
+  { id: '1', claimNo: 'CL-2026-0412-001', empNo: 'EMP001', name: '张伟', department: '研发部', insurancePlan: '补充医疗保险', claimType: '门诊', applyAmount: 1280, paidAmount: 960, submitDate: '2026-04-12', status: 'paid', progress: 100, materials: ['门诊发票', '费用清单', '病历记录'], currentNode: '赔付完成', remark: '门诊费用按80%比例赔付，扣除免赔额后已打款。' },
+  { id: '2', claimNo: 'CL-2026-0415-002', empNo: 'EMP002', name: '李娜', department: '市场部', insurancePlan: '补充医疗保险', claimType: '住院', applyAmount: 18600, paidAmount: 0, submitDate: '2026-04-15', status: 'reviewing', progress: 62, materials: ['住院发票', '出院小结', '费用明细'], currentNode: '保险公司审核', remark: '等待保险公司核定医保分割单。' },
+  { id: '3', claimNo: 'CL-2026-0417-003', empNo: 'EMP007', name: '孙浩', department: '研发部', insurancePlan: '团体意外险', claimType: '意外', applyAmount: 3200, paidAmount: 0, submitDate: '2026-04-17', status: 'submitted', progress: 35, materials: ['事故说明', '门诊发票'], currentNode: 'HR初审', remark: '需补充意外事故现场说明。' },
+  { id: '4', claimNo: 'CL-2026-0408-004', empNo: 'EMP006', name: '赵敏', department: '财务部', insurancePlan: '补充医疗保险', claimType: '门诊', applyAmount: 680, paidAmount: 510, submitDate: '2026-04-08', status: 'paying', progress: 88, materials: ['门诊发票', '处方单'], currentNode: '财务打款', remark: '赔付金额已确认，预计1个工作日到账。' },
+  { id: '5', claimNo: 'CL-2026-0328-005', empNo: 'EMP005', name: '陈明', department: '研发部', insurancePlan: '重大疾病险', claimType: '重疾', applyAmount: 100000, paidAmount: 0, submitDate: '2026-03-28', status: 'rejected', progress: 70, materials: ['诊断证明', '住院病历'], currentNode: '已驳回', remark: '既往病史不符合本方案承保及理赔条件。' },
+  { id: '6', claimNo: 'CL-2026-0419-006', empNo: 'EMP010', name: '郑丽', department: '市场部', insurancePlan: '门诊补充险', claimType: '门诊', applyAmount: 430, paidAmount: 0, submitDate: '2026-04-19', status: 'draft', progress: 15, materials: ['门诊发票'], currentNode: '员工补充材料', remark: '缺少费用明细，暂未提交保险公司。' },
 ];
 
 export const seedInsuredPersons: InsuredPerson[] = [

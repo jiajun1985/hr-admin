@@ -62,6 +62,24 @@ export interface InsuranceProgressRecord {
   remark: string;
 }
 
+export interface InsuranceClaimRecord {
+  id: string;
+  claimNo: string;
+  empNo: string;
+  name: string;
+  department: string;
+  insurancePlan: string;
+  claimType: '门诊' | '住院' | '意外' | '重疾';
+  applyAmount: number;
+  paidAmount: number;
+  submitDate: string;
+  status: 'draft' | 'submitted' | 'reviewing' | 'paying' | 'paid' | 'rejected';
+  progress: number;
+  materials: string[];
+  currentNode: string;
+  remark: string;
+}
+
 export interface InsuredPerson {
   id: string;
   empNo: string;

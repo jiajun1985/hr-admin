@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ListPageTemplate } from '../components/composites/ListPageTemplate';
 import type { Filter } from '../components/composites/FilterBar';
 import { type TableColumn } from '../components/composites/DataTable';
@@ -29,6 +29,7 @@ const InsuranceProgress: React.FC = () => {
   );
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<InsuranceProgressRecord | null>(null);
+  const [searchText, setSearchText] = useState('');
   const [planFilter, setPlanFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
 
@@ -41,10 +42,25 @@ const InsuranceProgress: React.FC = () => {
   };
 
   const filteredData = progressData.filter((item) => {
+    const keyword = searchText.trim();
+    if (keyword && ![item.name, item.empNo, item.department, item.insurancePlan].some((field) => field.includes(keyword))) return false;
     if (planFilter && item.insurancePlan !== planFilter) return false;
     if (statusFilter && item.status !== statusFilter) return false;
     return true;
   });
+
+  const stats = useMemo(() => {
+    const processing = progressData.filter((item) => ['pending', 'submitting', 'underwriting'].includes(item.status)).length;
+    const insured = progressData.filter((item) => item.status === 'insured').length;
+    const pending = progressData.filter((item) => ['pending', 'submitting'].includes(item.status)).length;
+    const rejected = progressData.filter((item) => item.status === 'rejected').length;
+    return [
+      { title: '投保中', value: processing, subText: '待提交/确认/承保中', trend: { value: '当前筛选', direction: 'neutral' as const, percentage: `${filteredData.length}条` } },
+      { title: '已承保', value: insured, subText: `完成率 ${progressData.length ? Math.round((insured / progressData.length) * 100) : 0}%` },
+      { title: '待处理', value: pending, subText: '需要 HR 或员工跟进' },
+      { title: '已拒绝', value: rejected, subText: '需复核原因' },
+    ];
+  }, [filteredData.length, progressData]);
 
   const columns: TableColumn<InsuranceProgressRecord>[] = [
     {
@@ -203,31 +219,6 @@ const InsuranceProgress: React.FC = () => {
     },
   ];
 
-  const stats = [
-    {
-      title: '投保中',
-      value: '156',
-      subText: '正在进行',
-      trend: { value: '较上周', direction: 'up' as const, percentage: '+12' },
-    },
-    {
-      title: '已承保',
-      value: '1,044',
-      subText: '累计生效',
-    },
-    {
-      title: '待处理',
-      value: '23',
-      subText: '需要跟进',
-      trend: { value: '较上周', direction: 'down' as const, percentage: '-5' },
-    },
-    {
-      title: '已拒绝',
-      value: '8',
-      subText: '本季度',
-    },
-  ];
-
   return (
     <>
       <ListPageTemplate
@@ -247,6 +238,12 @@ const InsuranceProgress: React.FC = () => {
         onFilterChange={(key, value) => {
           if (key === 'insurancePlan') handlePlanFilterChange(value);
           if (key === 'status') handleStatusFilterChange(value);
+        }}
+        onSearch={setSearchText}
+        onReset={() => {
+          setSearchText('');
+          setPlanFilter('');
+          setStatusFilter('');
         }}
         pagination={{
           current: 1,
@@ -347,6 +344,7 @@ const InsuranceProgress: React.FC = () => {
                 );
               })()}
             </div>
+            <ProgressSteps status={selectedRecord.status} />
             <div>
               <div style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '8px' }}>
                 备注说明
@@ -386,5 +384,44 @@ const InfoCard: React.FC<{ label: string; value: string }> = ({ label, value }) 
     </div>
   </div>
 );
+
+const statusOrder: Array<{ key: InsuranceProgressRecord['status']; label: string; hint: string }> = [
+  { key: 'pending', label: '资料准备', hint: '收集投保信息' },
+  { key: 'submitting', label: '员工确认', hint: '确认身份与受益人' },
+  { key: 'underwriting', label: '保险审核', hint: '保险公司核保' },
+  { key: 'insured', label: '保障生效', hint: '生成保单' },
+];
+
+const ProgressSteps: React.FC<{ status: InsuranceProgressRecord['status'] }> = ({ status }) => {
+  const activeIndex = status === 'rejected' ? 2 : statusOrder.findIndex((item) => item.key === status);
+  const nextAction: Record<InsuranceProgressRecord['status'], string> = {
+    pending: '下一步：提醒员工补充身份证、联系方式和受益人信息。',
+    submitting: '下一步：等待员工确认投保资料，必要时发送站内信提醒。',
+    underwriting: '下一步：关注保险公司核保反馈，超48小时建议人工催办。',
+    insured: '已完成：保障已生效，可在方案详情查看被保人名单。',
+    rejected: '下一步：复核拒保原因，必要时改投其他方案或补充说明材料。',
+  };
+
+  return (
+    <div style={{ marginBottom: '24px' }}>
+      <div style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '12px' }}>进度节点</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
+        {statusOrder.map((step, index) => {
+          const done = index <= activeIndex && status !== 'rejected';
+          const current = index === activeIndex;
+          return (
+            <div key={step.key} style={{ padding: '10px', borderRadius: '8px', backgroundColor: done ? 'var(--primary-50)' : 'var(--gray-50)', border: `1px solid ${current ? 'var(--primary-300)' : 'var(--gray-100)'}` }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: done ? 'var(--primary-700)' : 'var(--gray-500)' }}>{step.label}</div>
+              <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginTop: '4px' }}>{step.hint}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: status === 'rejected' ? 'var(--error-50)' : 'var(--info-50)', color: status === 'rejected' ? 'var(--error-700)' : 'var(--info-700)', fontSize: '13px' }}>
+        {nextAction[status]}
+      </div>
+    </div>
+  );
+};
 
 export default InsuranceProgress;

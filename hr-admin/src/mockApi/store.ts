@@ -2,6 +2,7 @@ import type {
   Employee,
   Department,
   InsurancePlan,
+  InsuranceClaimRecord,
   InsuranceProgressRecord,
   InsuredPerson,
   InsuranceOperationRecord,
@@ -35,6 +36,7 @@ interface Store {
   departments: Department[];
   insurancePlans: InsurancePlan[];
   insuranceProgress: InsuranceProgressRecord[];
+  insuranceClaims: InsuranceClaimRecord[];
   insuredPersons: InsuredPerson[];
   insuranceOperationRecords: InsuranceOperationRecord[];
   insuranceMaterials: InsuranceMaterial[];
@@ -62,6 +64,7 @@ function createInitialStore(): Store {
     departments: getDemoStorage(DEMO_STORAGE_KEYS.departments, seedData.seedDepartments),
     insurancePlans: getDemoStorage(DEMO_STORAGE_KEYS.insurancePlans, seedData.seedInsurancePlans),
     insuranceProgress: getDemoStorage(DEMO_STORAGE_KEYS.insuranceProgress, seedData.seedInsuranceProgress),
+    insuranceClaims: getDemoStorage(DEMO_STORAGE_KEYS.insuranceClaims, seedData.seedInsuranceClaims),
     insuredPersons: getDemoStorage(DEMO_STORAGE_KEYS.insuredPersons, seedData.seedInsuredPersons),
     insuranceOperationRecords: getDemoStorage(DEMO_STORAGE_KEYS.insuranceOperationRecords, seedData.seedInsuranceOperationRecords),
     insuranceMaterials: getDemoStorage(DEMO_STORAGE_KEYS.insuranceMaterials, seedData.seedInsuranceMaterials),
@@ -108,6 +111,7 @@ export const getEmployees = () => store.employees;
 export const getDepartments = () => store.departments;
 export const getInsurancePlans = () => store.insurancePlans;
 export const getInsuranceProgress = () => store.insuranceProgress;
+export const getInsuranceClaims = () => store.insuranceClaims;
 export const getInsuredPersons = () => store.insuredPersons;
 export const getInsuranceOperationRecords = () => store.insuranceOperationRecords;
 export const getInsuranceMaterials = () => store.insuranceMaterials;
@@ -132,6 +136,7 @@ export const setEmployees = (data: Employee[]) => { store.employees = data; setD
 export const setDepartments = (data: Department[]) => { store.departments = data; setDemoStorage(DEMO_STORAGE_KEYS.departments, data); };
 export const setInsurancePlans = (data: InsurancePlan[]) => { store.insurancePlans = data; setDemoStorage(DEMO_STORAGE_KEYS.insurancePlans, data); };
 export const setInsuranceProgress = (data: InsuranceProgressRecord[]) => { store.insuranceProgress = data; setDemoStorage(DEMO_STORAGE_KEYS.insuranceProgress, data); };
+export const setInsuranceClaims = (data: InsuranceClaimRecord[]) => { store.insuranceClaims = data; setDemoStorage(DEMO_STORAGE_KEYS.insuranceClaims, data); };
 export const setInsuredPersons = (data: InsuredPerson[]) => { store.insuredPersons = data; setDemoStorage(DEMO_STORAGE_KEYS.insuredPersons, data); };
 export const setInsuranceOperationRecords = (data: InsuranceOperationRecord[]) => { store.insuranceOperationRecords = data; setDemoStorage(DEMO_STORAGE_KEYS.insuranceOperationRecords, data); };
 export const setInsuranceMaterials = (data: InsuranceMaterial[]) => { store.insuranceMaterials = data; setDemoStorage(DEMO_STORAGE_KEYS.insuranceMaterials, data); };
