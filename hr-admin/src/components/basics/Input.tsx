@@ -65,32 +65,36 @@ export const Input: React.FC<InputProps> = ({
     outline: 'none',
     backgroundColor: 'transparent',
     fontSize: sizeStyles[size].fontSize,
+    fontWeight: 400,
     color: contentColor || 'var(--gray-800)',
     ...(disabled ? { cursor: 'not-allowed', color: 'var(--gray-400)' } : {}),
   };
 
   const prefixStyle: React.CSSProperties = {
-    marginRight: '8px',
+    marginRight: '6px',
     color: 'var(--gray-400)',
     display: 'flex',
     alignItems: 'center',
+    flexShrink: 0,
   };
 
   const suffixStyle: React.CSSProperties = {
-    marginLeft: '8px',
+    marginLeft: '6px',
     color: 'var(--gray-400)',
     display: 'flex',
     alignItems: 'center',
+    flexShrink: 0,
   };
 
   return (
     <div>
       <div style={containerStyle}>
-        {prefix && <span style={prefixStyle}>{prefix}</span>}
-        {typeof prefix === 'string' ? (
-          <span style={{ ...prefixStyle, fontSize: sizeStyles[size].fontSize }}>{prefix}</span>
-        ) : (
-          prefix
+        {prefix && (
+          typeof prefix === 'string' ? (
+            <span style={{ ...prefixStyle, fontSize: sizeStyles[size].fontSize, fontWeight: 400 }}>{prefix}</span>
+          ) : (
+            <span style={prefixStyle}>{prefix}</span>
+          )
         )}
         <input
           style={inputStyle}
@@ -106,11 +110,10 @@ export const Input: React.FC<InputProps> = ({
           {...props}
         />
         {typeof suffix === 'string' ? (
-          <span style={{ ...suffixStyle, fontSize: sizeStyles[size].fontSize }}>{suffix}</span>
+          <span style={{ ...suffixStyle, fontSize: sizeStyles[size].fontSize, fontWeight: 400 }}>{suffix}</span>
         ) : (
-          suffix
+          suffix && <span style={suffixStyle}>{suffix}</span>
         )}
-        {suffix && typeof suffix !== 'string' && <span style={suffixStyle}>{suffix}</span>}
       </div>
       {status === 'error' && errorMessage && (
         <div style={{ fontSize: '12px', color: 'var(--error-600)', marginTop: '4px' }}>

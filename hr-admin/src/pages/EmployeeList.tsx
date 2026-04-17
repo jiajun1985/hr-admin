@@ -445,11 +445,20 @@ const EmployeeList: React.FC = () => {
     { buttonType: 'primary' as const, label: '新增员工', icon: 'plus' as const, onClick: openAddModal },
   ];
 
+  const activeEmployees = employees.filter((e) => e.status === 'active');
+  const activeMaleCount = activeEmployees.filter((e) => e.gender === '男').length;
+  const activeFemaleCount = activeEmployees.filter((e) => e.gender === '女').length;
+
   const stats = [
-    { title: '在职员工', value: String(employees.filter((e) => e.status === 'active').length), trend: { value: '较上月', direction: 'up' as const, percentage: '+1.2%' }, subText: '总人数' },
-    { title: '本月新入职', value: '18', trend: { value: '较上月', direction: 'up' as const, percentage: '+5.0%' }, subText: '待完善: 3人' },
-    { title: '本月离职', value: String(employees.filter((e) => e.status === 'inactive').length), trend: { value: '较上月', direction: 'down' as const, percentage: '-2.5%' }, subText: '已结算' },
-    { title: '福利激活率', value: '97.9', suffix: '%', trend: { value: '较上月', direction: 'up' as const, percentage: '+0.5%' }, subText: '未激活: 25人' },
+    { title: '在职员工', value: String(activeEmployees.length), trend: { value: '较上月', direction: 'up' as const, percentage: '+1.2%' }, subText: `男：${activeMaleCount} 人    女：${activeFemaleCount} 人` },
+    { title: '本月入职', value: '18', trend: { value: '较上月', direction: 'up' as const, percentage: '+5.0%' }, subText: '待完善: 3人' },
+    {
+      title: '累计离职',
+      value: String(employees.filter((e) => e.status === 'inactive').length),
+      trend: { value: '较上月', direction: 'down' as const, percentage: '-2.5%' },
+      subText: `本月离职：${employees.filter((e) => e.status === 'inactive').length} 人`,
+    },
+    { title: '员工激活', value: '97.9', suffix: '%', trend: { value: '较上月', direction: 'up' as const, percentage: '+0.5%' }, subText: '未激活: 25人' },
   ];
 
   const getSelectedItems = (keys: (string | number)[]) => {
