@@ -187,19 +187,20 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKe
   const isSelected = selectedId === node.id;
 
   return (
-    <div>
+    <div style={{ marginBottom: '4px' }}>
       <div
         onClick={() => onSelect(node)}
         style={{
           display: 'flex',
           alignItems: 'center',
+          gap: '10px',
+          minHeight: '42px',
           padding: '8px 12px',
-          paddingLeft: `${level * 20 + 12}px`,
+          paddingLeft: `${12 + level * 18}px`,
           cursor: 'pointer',
           backgroundColor: isSelected ? 'var(--primary-50)' : 'transparent',
-          borderRadius: 'var(--radius-sm)',
-          marginBottom: '2px',
-          transition: 'background-color 0.15s',
+          borderRadius: '12px',
+          transition: 'background-color 0.15s ease, transform 0.15s ease',
         }}
         onMouseEnter={(e) => {
           if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--gray-50)';
@@ -214,29 +215,73 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node, level, selectedId, expandedKe
               e.stopPropagation();
               onToggle(node.id);
             }}
-            style={{ marginRight: '4px', display: 'flex', alignItems: 'center', color: 'var(--gray-400)' }}
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--gray-400)',
+              backgroundColor: 'var(--gray-100)',
+              flexShrink: 0,
+            }}
           >
             <Icon name={isExpanded ? 'chevron-down' : 'chevron-right'} size={14} />
           </span>
         ) : (
-          <span style={{ width: '18px' }} />
+          <span style={{ width: '24px', height: '24px', flexShrink: 0 }} />
         )}
-        <Icon name="department" size={16} color={isSelected ? 'var(--primary-600)' : 'var(--gray-400)'} />
         <span
           style={{
-            marginLeft: '8px',
-            fontSize: '13px',
+            width: '30px',
+            height: '30px',
+            borderRadius: '10px',
+            backgroundColor: isSelected ? 'var(--primary-100)' : 'var(--gray-100)',
+            color: isSelected ? 'var(--primary-600)' : 'var(--gray-400)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <Icon name="department" size={16} color="currentColor" />
+        </span>
+        <span
+          style={{
+            marginLeft: '2px',
+            fontSize: '14px',
             color: isSelected ? 'var(--primary-600)' : 'var(--gray-700)',
             fontWeight: isSelected ? 500 : 400,
             flex: 1,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
           {node.name}
         </span>
-        <Tag color="default" style={{ fontSize: '11px', padding: '2px 6px' }}>{employeeCountMap[node.id] ?? 0}</Tag>
+        <Tag
+          color="default"
+          style={{
+            fontSize: '11px',
+            padding: '2px 8px',
+            borderRadius: '999px',
+            backgroundColor: 'var(--gray-100)',
+            color: 'var(--gray-600)',
+          }}
+        >
+          {employeeCountMap[node.id] ?? 0}
+        </Tag>
       </div>
       {hasChildren && isExpanded && (
-        <div>
+        <div
+          style={{
+            marginTop: '2px',
+            display: 'grid',
+            gap: '4px',
+          }}
+        >
           {node.children!.map((child) => (
             <TreeNode
               key={child.id}
@@ -741,12 +786,16 @@ const DepartmentPage: React.FC = () => {
       <div style={{ display: 'flex', gap: '16px' }}>
         <div style={{ width: '25%', flexShrink: 0, backgroundColor: 'var(--gray-0)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
           <div style={{ marginBottom: '12px' }}>
-            <Input
-              placeholder="搜索部门..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              style={{ marginBottom: '8px' }}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Input
+                  placeholder="搜索部门..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </div>
+              <Button size="sm" type="primary" icon="plus" onClick={handleAddDept}>新增部门</Button>
+            </div>
             {searchValue && searchResults.length > 0 && (
               <div style={{ backgroundColor: 'var(--gray-0)', border: '1px solid var(--gray-200)', borderRadius: 'var(--radius-sm)', maxHeight: '200px', overflow: 'auto' }}>
                 {searchResults.map((result) => (
@@ -765,10 +814,6 @@ const DepartmentPage: React.FC = () => {
                 ))}
               </div>
             )}
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-            <Button size="sm" type="primary" icon="plus" onClick={handleAddDept}>新增部门</Button>
           </div>
 
           <div style={{ maxHeight: 'calc(100vh - 400px)', overflow: 'auto' }}>
@@ -906,7 +951,8 @@ const DepartmentPage: React.FC = () => {
         open={assignDeptOpen}
         onClose={closeAssignDept}
         title="分配部门"
-        size="lg"
+        size="xl"
+        bodyContentStyle={{ overflow: 'hidden' }}
         footer={[
           <Button key="cancel" type="secondary" onClick={closeAssignDept}>取消</Button>,
           <Button
@@ -919,8 +965,8 @@ const DepartmentPage: React.FC = () => {
           </Button>,
         ]}
       >
-        <div style={{ display: 'grid', gridTemplateColumns: selectedDepartment?.id === '1' ? '1fr 1.2fr' : '1fr', gap: '16px' }}>
-          <div>
+        <div style={{ display: 'grid', gridTemplateColumns: selectedDepartment?.id === '1' ? 'minmax(300px, 0.88fr) minmax(580px, 1.42fr)' : '1fr', gap: '16px' }}>
+          <div style={{ minWidth: 0 }}>
             <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: 'var(--info-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--info-600)' }}>
               当前未分配员工：<strong>{unassignedCount}</strong> 人，当前可分配：<strong>{assignableUnassignedEmployees.length}</strong> 人
             </div>
@@ -942,7 +988,7 @@ const DepartmentPage: React.FC = () => {
             )}
           </div>
 
-          <div>
+          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ marginBottom: '12px' }}>
               <Input
                 placeholder="搜索员工姓名 / 工号 / 手机号"
@@ -950,33 +996,32 @@ const DepartmentPage: React.FC = () => {
                 onChange={(e) => setAssignSearch(e.target.value)}
               />
             </div>
-            <div style={{ maxHeight: '360px', overflow: 'auto', border: '1px solid var(--gray-200)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ border: '1px solid var(--gray-200)', borderRadius: 'var(--radius-sm)', overflow: 'auto', flex: 1, minHeight: 0, maxHeight: 'calc(90vh - 290px)' }}>
               {filteredAssignableEmployees.length === 0 ? (
                 <div style={{ padding: '20px', textAlign: 'center', color: 'var(--gray-400)', fontSize: '13px' }}>
                   暂无可分配员工
                 </div>
               ) : (
-                filteredAssignableEmployees.map((emp) => (
-                  (() => {
-                    const statusMeta = getEmploymentStatusMeta(emp, currentDate);
-                    const isSelectable = statusMeta.label === '在职';
-                    return (
-                  <label
-                    key={emp.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '12px',
-                      padding: '10px 12px',
-                      borderBottom: '1px solid var(--gray-100)',
-                      cursor: isSelectable ? 'pointer' : 'not-allowed',
-                      opacity: isSelectable ? 1 : 0.6,
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--gray-50)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                filteredAssignableEmployees.map((emp) => {
+                  const statusMeta = getEmploymentStatusMeta(emp, currentDate);
+                  const isSelectable = statusMeta.label === '在职';
+                  return (
+                    <label
+                      key={emp.id}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '24px minmax(0, 1fr) auto',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px 16px',
+                        borderBottom: '1px solid var(--gray-100)',
+                        cursor: isSelectable ? 'pointer' : 'not-allowed',
+                        opacity: isSelectable ? 1 : 0.6,
+                        minHeight: '52px',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--gray-50)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                    >
                       <input
                         type="checkbox"
                         checked={assignEmployeeIds.includes(emp.id)}
@@ -989,19 +1034,54 @@ const DepartmentPage: React.FC = () => {
                               : prev.filter((id) => id !== emp.id)
                           ));
                         }}
+                        style={{ justifySelf: 'center', margin: 0 }}
                       />
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '13px', color: 'var(--gray-800)', fontWeight: 500 }}>{emp.name}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--gray-500)' }}>{emp.empNo} · {emp.position} · {emp.department || '未分配'}</div>
+                      <div style={{ minWidth: 0, display: 'flex', alignItems: 'center' }}>
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'minmax(120px, 1fr) minmax(96px, 0.9fr) minmax(128px, 1fr)',
+                            alignItems: 'center',
+                            columnGap: '16px',
+                            minWidth: 0,
+                            lineHeight: 1.3,
+                            fontSize: '13px',
+                            width: '100%',
+                          }}
+                        >
+                          <span style={{ color: 'var(--gray-800)', fontWeight: 500, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {emp.name}
+                          </span>
+                          <span
+                            style={{
+                              color: 'var(--gray-500)',
+                              fontVariantNumeric: 'tabular-nums lining-nums',
+                              fontFeatureSettings: '"tnum" 1, "lnum" 1',
+                              letterSpacing: 0,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {emp.empNo}
+                          </span>
+                          <span
+                            style={{
+                              color: 'var(--gray-500)',
+                              fontVariantNumeric: 'tabular-nums lining-nums',
+                              fontFeatureSettings: '"tnum" 1, "lnum" 1',
+                              letterSpacing: 0,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {emp.phone}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <Tag color={isSelectable ? 'warning' : 'default'} style={{ whiteSpace: 'nowrap' }}>
-                      {isSelectable ? '待分配' : statusMeta.label}
-                    </Tag>
-                  </label>
-                    );
-                  })()
-                ))
+                      <Tag color={isSelectable ? 'warning' : 'default'} style={{ whiteSpace: 'nowrap', justifySelf: 'end' }}>
+                        {isSelectable ? '待分配' : statusMeta.label}
+                      </Tag>
+                    </label>
+                  );
+                })
               )}
             </div>
           </div>

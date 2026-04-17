@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from './Icon';
 
-export type ModalSize = 'sm' | 'md' | 'lg';
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 
 interface ModalProps {
   open: boolean;
@@ -12,12 +12,14 @@ interface ModalProps {
   children: React.ReactNode;
   closeOnOverlay?: boolean;
   showClose?: boolean;
+  bodyContentStyle?: React.CSSProperties;
 }
 
 const sizeWidths: Record<ModalSize, number> = {
   sm: 400,
   md: 560,
   lg: 720,
+  xl: 960,
 };
 
 export const Modal: React.FC<ModalProps> = ({
@@ -29,6 +31,7 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   closeOnOverlay = true,
   showClose = true,
+  bodyContentStyle,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -116,7 +119,7 @@ export const Modal: React.FC<ModalProps> = ({
     transition: 'all 0.15s',
   };
 
-  const bodyStyle: React.CSSProperties = {
+  const bodyContainerStyle: React.CSSProperties = {
     flex: 1,
     padding: '20px',
     overflow: 'auto',
@@ -155,7 +158,7 @@ export const Modal: React.FC<ModalProps> = ({
             )}
           </div>
         )}
-        <div style={bodyStyle}>{children}</div>
+        <div style={{ ...bodyContainerStyle, ...bodyContentStyle }}>{children}</div>
         {footer && <div style={footerStyle}>{footer}</div>}
       </div>
     </div>
