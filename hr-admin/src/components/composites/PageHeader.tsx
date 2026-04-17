@@ -2,6 +2,7 @@ import React from 'react';
 import { Breadcrumb, type BreadcrumbItem } from '../basics/Breadcrumb';
 import { Button } from '../basics/Button';
 import { type IconName } from '../basics/Icon';
+import { pageTitleStyle, panelPadding, panelSurfaceStyle, panelSubtitleStyle } from './surfaceStyles';
 
 interface Action {
   type?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'text';
@@ -30,9 +31,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   actions = [],
 }) => {
   const containerStyle: React.CSSProperties = {
-    backgroundColor: 'var(--gray-0)',
-    borderRadius: 'var(--radius-md)',
-    padding: '20px',
+    ...panelSurfaceStyle,
+    padding: `${panelPadding}px`,
     marginBottom: '16px',
   };
 
@@ -53,9 +53,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: '20px',
-    fontWeight: 600,
-    color: 'var(--gray-800)',
+    ...pageTitleStyle,
     marginBottom: description ? '4px' : 0,
     display: 'flex',
     alignItems: 'center',
@@ -63,9 +61,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   };
 
   const descriptionStyle: React.CSSProperties = {
-    fontSize: '13px',
-    color: 'var(--gray-400)',
-    lineHeight: '1.5',
+    ...panelSubtitleStyle,
   };
 
   const actionsStyle: React.CSSProperties = {

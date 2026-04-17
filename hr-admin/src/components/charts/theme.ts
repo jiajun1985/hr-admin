@@ -22,7 +22,7 @@ export const chartGridStroke = 'var(--gray-100)';
 
 export const chartPanelBorder = '1px solid rgba(226, 232, 240, 0.9)';
 
-export const chartPanelShadow = '0 12px 32px rgba(15, 23, 42, 0.05)';
+export const chartPanelShadow = 'var(--shadow-card)';
 
 export const chartTooltipCursor = {
   fill: 'rgba(37, 99, 235, 0.06)',

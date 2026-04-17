@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from './Icon';
+import { panelSurfaceStyle } from '../composites/surfaceStyles';
+import { panelTitleStyle } from '../composites/surfaceStyles';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -81,8 +83,7 @@ export const Modal: React.FC<ModalProps> = ({
     width: sizeWidths[size],
     maxWidth: '90vw',
     maxHeight: '90vh',
-    backgroundColor: 'var(--gray-0)',
-    borderRadius: 'var(--radius-md)',
+    ...panelSurfaceStyle,
     boxShadow: 'var(--shadow-lg)',
     display: 'flex',
     flexDirection: 'column',
@@ -100,9 +101,7 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: 'var(--gray-800)',
+    ...panelTitleStyle,
   };
 
   const closeButtonStyle: React.CSSProperties = {

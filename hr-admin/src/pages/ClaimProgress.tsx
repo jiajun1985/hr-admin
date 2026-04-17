@@ -5,6 +5,7 @@ import type { TableColumn } from '../components/composites/DataTable';
 import { Button } from '../components/basics/Button';
 import { Modal } from '../components/basics/Modal';
 import { Tag } from '../components/basics/Tag';
+import { panelPadding, panelSurfaceStyle, panelSubtitleStyle, panelTitleStyle } from '../components/composites/surfaceStyles';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedInsuranceClaims } from '../mockApi/demoData';
 import type { InsuranceClaimRecord } from '../mockApi/types';
@@ -116,7 +117,7 @@ const ClaimProgress: React.FC = () => {
               <InfoCard label="提交时间" value={selectedClaim.submitDate} />
             </div>
             <div style={{ marginBottom: '20px' }}>
-              <div style={{ fontSize: '13px', color: 'var(--gray-600)', marginBottom: '8px' }}>处理进度</div>
+              <div style={panelSubtitleStyle}>处理进度</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ flex: 1, height: '8px', backgroundColor: 'var(--gray-100)', borderRadius: '999px', overflow: 'hidden' }}>
                   <div style={{ width: `${selectedClaim.progress}%`, height: '100%', backgroundColor: selectedClaim.status === 'rejected' ? 'var(--error-500)' : 'var(--primary-500)' }} />
@@ -125,12 +126,13 @@ const ClaimProgress: React.FC = () => {
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={{ padding: '14px', backgroundColor: 'var(--gray-50)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '10px' }}>已收材料</div>
+              <div style={{ ...panelSurfaceStyle, padding: `${panelPadding}px` }}>
+                <div style={panelTitleStyle}>已收材料</div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>{selectedClaim.materials.map((item) => <Tag key={item} color="info">{item}</Tag>)}</div>
               </div>
-              <div style={{ padding: '14px', backgroundColor: selectedClaim.status === 'rejected' ? 'var(--error-50)' : 'var(--info-50)', borderRadius: '8px', fontSize: '13px', color: selectedClaim.status === 'rejected' ? 'var(--error-700)' : 'var(--info-700)' }}>
-                <strong>处理建议：</strong>{selectedClaim.remark}
+              <div style={{ ...panelSurfaceStyle, padding: `${panelPadding}px`, backgroundColor: selectedClaim.status === 'rejected' ? 'var(--error-50)' : 'var(--info-50)' }}>
+                <div style={panelTitleStyle}>处理建议</div>
+                <div style={{ fontSize: '13px', color: selectedClaim.status === 'rejected' ? 'var(--error-700)' : 'var(--info-700)', lineHeight: 1.6 }}>{selectedClaim.remark}</div>
               </div>
             </div>
           </div>
@@ -141,9 +143,9 @@ const ClaimProgress: React.FC = () => {
 };
 
 const InfoCard: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div style={{ padding: '12px', backgroundColor: 'var(--gray-50)', borderRadius: '8px' }}>
-    <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '4px' }}>{label}</div>
-    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-700)' }}>{value}</div>
+  <div style={{ ...panelSurfaceStyle, padding: '12px' }}>
+    <div style={panelSubtitleStyle}>{label}</div>
+    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-700)', marginTop: '4px' }}>{value}</div>
   </div>
 );
 

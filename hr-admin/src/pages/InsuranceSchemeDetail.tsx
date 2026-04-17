@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../components/composites/PageHeader';
 import { DataTable, type TableColumn } from '../components/composites/DataTable';
+import { panelPadding, panelSurfaceStyle, panelSubtitleStyle, panelTitleStyle } from '../components/composites/surfaceStyles';
 import { Button } from '../components/basics/Button';
 import { Tag } from '../components/basics/Tag';
 import { Modal } from '../components/basics/Modal';
@@ -79,8 +80,8 @@ const departmentOptions = [
 
 const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div>
-    <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '2px' }}>{label}</div>
-    <div style={{ fontSize: '13px', color: 'var(--gray-700)' }}>{value}</div>
+    <div style={panelSubtitleStyle}>{label}</div>
+    <div style={{ fontSize: '13px', color: 'var(--gray-700)', marginTop: '2px' }}>{value}</div>
   </div>
 );
 
@@ -273,8 +274,8 @@ const InsuranceSchemeDetail: React.FC = () => {
       />
 
       <div style={{ display: 'grid', gridTemplateColumns: '7fr 5fr', gap: '20px', marginBottom: '24px' }}>
-        <div style={{ backgroundColor: 'var(--gray-0)', borderRadius: '8px', padding: '24px', border: '1px solid var(--gray-200)' }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--gray-800)', marginBottom: '16px' }}>方案概览</div>
+        <div style={{ ...panelSurfaceStyle, padding: `${panelPadding + 4}px` }}>
+          <div style={panelTitleStyle}>方案概览</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px 24px', marginBottom: '16px' }}>
             <InfoRow label="保险方案" value={`${schemeInfo.name} (基础版)`} />
             <InfoRow label="保单号码" value={schemeInfo.policyNo} />
@@ -286,7 +287,7 @@ const InsuranceSchemeDetail: React.FC = () => {
             <InfoRow label="企业保费" value={`¥${schemeInfo.premium.toLocaleString()}/年`} />
           </div>
           <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--gray-100)' }}>
-            <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--gray-700)', marginBottom: '8px' }}>保障内容</div>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--gray-700)', marginBottom: '8px' }}>保障内容</div>
             <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--gray-600)', fontSize: '13px', lineHeight: '1.8' }}>
               {schemeInfo.benefits.map((b, i) => <li key={i}>{b}</li>)}
             </ul>
@@ -298,24 +299,24 @@ const InsuranceSchemeDetail: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ backgroundColor: 'var(--gray-0)', borderRadius: '8px', padding: '20px', border: '1px solid var(--gray-200)' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-800)', marginBottom: '12px' }}>快捷操作</div>
+          <div style={{ ...panelSurfaceStyle, padding: `${panelPadding}px` }}>
+            <div style={panelTitleStyle}>快捷操作</div>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <Button type="primary" onClick={() => setAddModalOpen(true)}>加员</Button>
               <Button type="primary" onClick={() => setReduceModalOpen(true)}>减员</Button>
               <Button type="primary" onClick={() => setReplaceModalOpen(true)}>替换人员</Button>
             </div>
           </div>
-          <div style={{ backgroundColor: 'var(--gray-0)', borderRadius: '8px', padding: '20px', border: '1px solid var(--gray-200)' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-800)', marginBottom: '12px' }}>本月变更统计</div>
+          <div style={{ ...panelSurfaceStyle, padding: `${panelPadding}px` }}>
+            <div style={panelTitleStyle}>本月变更统计</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--gray-600)' }}>
               <div>已加员：<span style={{ color: 'var(--success-600)' }}>+{stats.addCount} 人</span></div>
               <div>已减员：<span style={{ color: 'var(--error-600)' }}>-{stats.reduceCount} 人</span></div>
               <div>待生效：<span style={{ color: 'var(--warning-600)' }}>{stats.pendingCount} 人 ({stats.pendingDate} 生效)</span></div>
             </div>
           </div>
-          <div style={{ backgroundColor: 'var(--gray-0)', borderRadius: '8px', padding: '20px', border: '1px solid var(--gray-200)' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-800)', marginBottom: '12px' }}>生效规则提醒</div>
+          <div style={{ ...panelSurfaceStyle, padding: `${panelPadding}px` }}>
+            <div style={panelTitleStyle}>生效规则提醒</div>
             <div style={{ fontSize: '13px', color: 'var(--gray-600)', lineHeight: '1.6' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--success-600)', marginBottom: '4px' }}>
                 <Icon name="check" size={14} /> 当前可操作

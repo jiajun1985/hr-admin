@@ -1,6 +1,7 @@
 import React from 'react';
 import { chartPanelShadow } from './theme';
 import type { ChartSummaryItem } from './types';
+import { panelPadding, panelSurfaceStyle, panelSubtitleStyle, panelTitleStyle } from '../composites/surfaceStyles';
 
 interface ChartCardProps {
   title: string;
@@ -24,11 +25,9 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   return (
     <div
       style={{
-        backgroundColor: 'var(--gray-0)',
-        border: 'none',
-        borderRadius: '8px',
+        ...panelSurfaceStyle,
         boxShadow: chartPanelShadow,
-        padding: '22px',
+        padding: `${panelPadding + 2}px`,
         minWidth: 0,
         minHeight: height,
         ...style,
@@ -44,11 +43,11 @@ export const ChartCard: React.FC<ChartCardProps> = ({
         }}
       >
         <div style={{ minWidth: 0 }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--gray-900)', marginBottom: '6px' }}>
+          <h3 style={panelTitleStyle}>
             {title}
           </h3>
           {description && (
-            <p style={{ fontSize: '12px', color: 'var(--gray-500)', lineHeight: 1.6 }}>{description}</p>
+            <p style={panelSubtitleStyle}>{description}</p>
           )}
         </div>
         {action && <div style={{ flexShrink: 0 }}>{action}</div>}

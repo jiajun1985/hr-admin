@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Breadcrumb } from '../basics/Breadcrumb';
 import { Button } from '../basics/Button';
 import { Icon, type IconName } from '../basics/Icon';
+import { pageTitleStyle, panelPadding, panelSurfaceStyle, panelSubtitleStyle, panelTitleStyle } from './surfaceStyles';
 
 export interface TabItem {
   key: string;
@@ -57,13 +58,12 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
   };
 
   const containerStyle: React.CSSProperties = {
-    backgroundColor: 'var(--gray-0)',
-    borderRadius: 'var(--radius-md)',
+    ...panelSurfaceStyle,
     overflow: 'hidden',
   };
 
   const headerStyle: React.CSSProperties = {
-    padding: '20px',
+    padding: `${panelPadding}px`,
   };
 
   const breadcrumbStyle: React.CSSProperties = {
@@ -78,15 +78,12 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: '20px',
-    fontWeight: 600,
-    color: 'var(--gray-800)',
+    ...pageTitleStyle,
     marginBottom: subtitle ? '4px' : 0,
   };
 
   const subtitleStyle: React.CSSProperties = {
-    fontSize: '13px',
-    color: 'var(--gray-400)',
+    ...panelSubtitleStyle,
   };
 
   const actionsStyle: React.CSSProperties = {
@@ -98,7 +95,7 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
 
   const tabsStyle: React.CSSProperties = {
     display: 'flex',
-    padding: '0 20px',
+    padding: `0 ${panelPadding}px`,
   };
 
   const tabStyle = (isActive: boolean, isDisabled?: boolean): React.CSSProperties => ({
@@ -134,13 +131,13 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
 
   const leftStyle: React.CSSProperties = {
     width: typeof leftWidth === 'number' ? `${leftWidth}px` : leftWidth,
-    padding: '20px',
+    padding: `${panelPadding}px`,
     flexShrink: 0,
   };
 
   const rightStyle: React.CSSProperties = {
     flex: 1,
-    padding: '20px',
+    padding: `${panelPadding}px`,
     minWidth: 0,
   };
 

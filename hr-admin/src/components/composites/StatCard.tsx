@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon } from '../basics/Icon';
+import { panelPadding, panelSurfaceStyle, panelSubtitleStyle } from './surfaceStyles';
 
 interface StatCardProps {
   title: string;
@@ -28,9 +29,8 @@ export const StatCard: React.FC<StatCardProps> = ({
   style,
 }) => {
   const cardStyle: React.CSSProperties = {
-    backgroundColor: 'var(--gray-0)',
-    borderRadius: 'var(--radius-md)',
-    padding: '20px',
+    ...panelSurfaceStyle,
+    padding: `${panelPadding}px`,
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
@@ -38,8 +38,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: '13px',
-    color: 'var(--gray-500)',
+    ...panelSubtitleStyle,
     marginBottom: '8px',
     fontWeight: 500,
   };

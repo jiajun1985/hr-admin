@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { PageHeader } from '../components/composites/PageHeader';
 import { StatCard } from '../components/composites/StatCard';
+import { panelSurfaceStyle } from '../components/composites/surfaceStyles';
 import { Tag } from '../components/basics/Tag';
 import { Icon, type IconName } from '../components/basics/Icon';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -135,21 +136,18 @@ const InsurancePlanPage: React.FC = () => {
             <div
               key={plan.id}
               style={{
-                backgroundColor: 'var(--gray-0)',
-                borderRadius: '8px',
+                ...panelSurfaceStyle,
                 padding: '20px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                border: '1px solid var(--gray-200)',
               }}
               onClick={() => handleCardClick(plan)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
+                e.currentTarget.style.boxShadow = '0 4px 10px rgba(15, 23, 42, 0.12)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-card)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
