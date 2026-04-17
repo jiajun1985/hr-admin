@@ -28,10 +28,6 @@ interface DashboardMetric {
     percentage?: string;
   };
   subText: string;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
 }
 
 interface TrendPoint {
@@ -236,7 +232,6 @@ const Dashboard: React.FC = () => {
       value: formatNumber(activeEmployees.length),
       trend: { value: '当前在职规模', direction: 'up', percentage: `${formatNumber(employees.length)}人` },
       subText: `离职 ${formatNumber(inactiveEmployees)} 人`,
-      action: { label: '查看全部员工', onClick: () => navigate('employee-list') },
     },
     {
       title: '最近入职月',
@@ -259,7 +254,6 @@ const Dashboard: React.FC = () => {
         direction: overdueBills.length > 0 ? 'down' : 'neutral',
       },
       subText: `逾期 ${formatNumber(overdueBills.length)} 笔`,
-      action: { label: '查看账单', onClick: () => navigate('bill-management') },
     },
   ];
 

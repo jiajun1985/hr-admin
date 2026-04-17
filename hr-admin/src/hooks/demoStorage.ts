@@ -1,4 +1,5 @@
 const DEMO_STORAGE_PREFIX = 'hr-admin:';
+const EMPLOYEE_STORAGE_VERSION = '2026-04-16-100';
 
 export const DEMO_STORAGE_KEYS = {
   employees: 'employees',
@@ -42,6 +43,15 @@ function cloneFallback<T>(fallback: T): T {
 export function getDemoStorage<T>(key: string, fallback: T): T {
   const storageKey = normalizeDemoStorageKey(key);
   try {
+    if (key === DEMO_STORAGE_KEYS.employees) {
+      const versionKey = `${storageKey}:version`;
+      const storedVersion = window.localStorage.getItem(versionKey);
+      if (storedVersion !== EMPLOYEE_STORAGE_VERSION) {
+        window.localStorage.removeItem(storageKey);
+        window.localStorage.setItem(versionKey, EMPLOYEE_STORAGE_VERSION);
+        return cloneFallback(fallback);
+      }
+    }
     const item = window.localStorage.getItem(storageKey);
     if (item) {
       return JSON.parse(item) as T;
@@ -56,6 +66,9 @@ export function setDemoStorage<T>(key: string, value: T): void {
   const storageKey = normalizeDemoStorageKey(key);
   try {
     window.localStorage.setItem(storageKey, JSON.stringify(value));
+    if (key === DEMO_STORAGE_KEYS.employees) {
+      window.localStorage.setItem(`${storageKey}:version`, EMPLOYEE_STORAGE_VERSION);
+    }
   } catch (error) {
     console.warn(`Error setting localStorage key "${storageKey}":`, error);
   }
@@ -65,6 +78,9 @@ export function resetDemoStorageKey(key: string): void {
   const storageKey = normalizeDemoStorageKey(key);
   try {
     window.localStorage.removeItem(storageKey);
+    if (key === DEMO_STORAGE_KEYS.employees) {
+      window.localStorage.removeItem(`${storageKey}:version`);
+    }
   } catch (error) {
     console.warn(`Error removing localStorage key "${storageKey}":`, error);
   }

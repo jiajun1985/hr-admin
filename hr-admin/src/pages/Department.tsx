@@ -545,6 +545,7 @@ const DepartmentPage: React.FC = () => {
     }
 
     const oldDept = transferEmployee.department;
+    const shouldClearManager = selectedDepartment?.manager === transferEmployee.name;
     setEmployees((prev) =>
       prev.map((emp) =>
         emp.id === transferEmployee.id ? { ...emp, department: targetDept.name } : emp
@@ -554,6 +555,13 @@ const DepartmentPage: React.FC = () => {
       setDepartments((prev) => updateNodeEmployeeCount(prev, oldDept, -1));
     }
     setDepartments((prev) => updateNodeEmployeeCount(prev, targetDept.name, 1));
+    if (shouldClearManager && selectedDepartment) {
+      setDepartments((prev) => updateNode(prev, selectedDepartment.id, {
+        manager: '-',
+        managerPhone: '-',
+      }));
+      setSelectedDepartment((prev) => (prev ? { ...prev, manager: '-', managerPhone: '-' } : prev));
+    }
     setTransferModalOpen(false);
     setTransferEmployeeId('');
     setTransferTargetId('');
@@ -1062,7 +1070,7 @@ const DepartmentPage: React.FC = () => {
           </div>
           {selectedDepartment && selectedDepartment.manager && selectedDepartment.manager !== '-' && (
             <div style={{ marginTop: '12px', padding: '12px', backgroundColor: 'var(--warning-50)', borderRadius: 'var(--radius-sm)', fontSize: '13px', color: 'var(--warning-600)' }}>
-              原负责人「{selectedDepartment.manager}」将被替换
+              原负责人「{selectedDepartment.manager}」将不再担任负责人
             </div>
           )}
         </div>
