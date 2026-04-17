@@ -124,7 +124,7 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   const thStyle = (align: 'left' | 'center' | 'right' = 'left'): React.CSSProperties => ({
-    padding: '14px 16px',
+    padding: '12px 14px',
     fontSize: '13px',
     fontWeight: 500,
     lineHeight: 1.4,
@@ -141,9 +141,9 @@ export function DataTable<T extends Record<string, any>>({
   });
 
   const tdStyle = (align: 'left' | 'center' | 'right' = 'left'): React.CSSProperties => ({
-    padding: '14px 16px',
+    padding: '12px 14px',
     fontSize: '13px',
-    lineHeight: 1.4,
+    lineHeight: 1.35,
     color: 'var(--gray-600)',
     textAlign: align,
     borderBottom: '1px solid var(--gray-100)',
@@ -186,7 +186,7 @@ export function DataTable<T extends Record<string, any>>({
   const paginationContainerStyle: React.CSSProperties = {
     display: 'flex',
     justifyContent: 'flex-end',
-    padding: '12px 16px',
+    padding: '10px 14px',
     borderTop: '1px solid var(--gray-100)',
   };
 
@@ -219,7 +219,7 @@ export function DataTable<T extends Record<string, any>>({
               </th>
             ))}
             {rowActions && rowActions.length > 0 && (
-              <th style={{ ...thStyle('center'), width: rowActions.length * 44 + 16 }}>
+              <th style={{ ...thStyle('center'), width: rowActions.length * 40 + 12 }}>
                 操作
               </th>
             )}
@@ -362,8 +362,8 @@ function RowRenderer<T extends Record<string, any>>({
         </td>
       ))}
       {rowActions && rowActions.length > 0 && (
-        <td style={{ ...tdStyle('center'), width: rowActions.length * 44 + 16, paddingTop: '0', paddingBottom: '0' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minHeight: '22px' }}>
+        <td style={{ ...tdStyle('center'), width: rowActions.length * 40 + 12, paddingTop: '0', paddingBottom: '0' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', minHeight: '20px' }}>
             {rowActions.map((action) =>
               action.hidden?.(record) ? null : (
                 <button
@@ -374,9 +374,9 @@ function RowRenderer<T extends Record<string, any>>({
                     border: 'none',
                     color: getActionColor(action.type),
                     cursor: 'pointer',
-                    fontSize: '13px',
+                    fontSize: '12px',
                     lineHeight: 1,
-                    height: '22px',
+                    height: '20px',
                     padding: 0,
                     display: 'inline-flex',
                     alignItems: 'center',

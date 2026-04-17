@@ -56,7 +56,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const containerStyle: React.CSSProperties = {
     backgroundColor: 'var(--gray-0)',
     borderRadius: 'var(--radius-md)',
-    padding: '16px 20px',
+    padding: '14px 16px',
     marginBottom: '16px',
   };
 
@@ -64,7 +64,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 16px',
+    padding: '10px 14px',
     backgroundColor: 'var(--primary-50)',
     border: '1px solid var(--primary-200)',
     borderRadius: 'var(--radius-md)',
@@ -76,7 +76,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     gridAutoFlow: 'column',
     gridAutoColumns: 'max-content',
     alignItems: 'center',
-    gap: '16px',
+    gap: '12px',
     justifyContent: 'start',
   };
 
@@ -89,7 +89,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   const filterLabelStyle: React.CSSProperties = {
-    fontSize: '13px',
+    fontSize: '12px',
     color: 'var(--gray-500)',
     whiteSpace: 'nowrap',
     lineHeight: 1,
@@ -98,7 +98,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const actionGroupStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '6px',
     marginLeft: 'auto',
   };
 

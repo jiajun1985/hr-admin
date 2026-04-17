@@ -3,6 +3,7 @@ import { PageHeader } from '../components/composites/PageHeader';
 import { StatCard } from '../components/composites/StatCard';
 import { Icon, type IconName } from '../components/basics/Icon';
 import { BarTrendChart, ChartCard, DonutChart, HorizontalBarChart } from '../components/charts';
+import { panelSurfaceStyle } from '../components/composites/surfaceStyles';
 import { DEMO_STORAGE_KEYS } from '../hooks/demoStorage';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { useNavigation, type PageKey } from '../contexts/NavigationContext';
@@ -417,8 +418,7 @@ const lowerGridStyle: React.CSSProperties = {
 };
 
 const panelStyle: React.CSSProperties = {
-  backgroundColor: 'var(--gray-0)',
-  borderRadius: 'var(--radius-md)',
+  ...panelSurfaceStyle,
   padding: '20px',
   minWidth: 0,
 };

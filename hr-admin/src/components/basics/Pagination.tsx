@@ -70,9 +70,9 @@ export const Pagination: React.FC<PaginationProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '32px',
-    height: '32px',
-    padding: '0 8px',
+    minWidth: '30px',
+    height: '30px',
+    padding: '0 7px',
     border: '1px solid var(--gray-200)',
     borderRadius: 'var(--radius-sm)',
     backgroundColor: active ? 'var(--primary-600)' : 'var(--gray-0)',
@@ -87,8 +87,8 @@ export const Pagination: React.FC<PaginationProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '32px',
-    height: '32px',
+    width: '30px',
+    height: '30px',
     border: '1px solid var(--gray-200)',
     borderRadius: 'var(--radius-sm)',
     backgroundColor: 'var(--gray-0)',
@@ -99,7 +99,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   });
 
   const selectStyle: React.CSSProperties = {
-    height: '32px',
+    height: '30px',
     padding: '0 8px',
     border: '1px solid var(--gray-200)',
     borderRadius: 'var(--radius-sm)',
@@ -118,8 +118,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   };
 
   const jumperInputStyle: React.CSSProperties = {
-    width: '48px',
-    height: '32px',
+    width: '44px',
+    height: '30px',
     padding: '0 8px',
     border: '1px solid var(--gray-200)',
     borderRadius: 'var(--radius-sm)',

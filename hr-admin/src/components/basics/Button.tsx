@@ -48,9 +48,9 @@ const buttonStyles: Record<string, React.CSSProperties> = {
 };
 
 const sizeStyles = {
-  sm: { height: '28px', padding: '0 12px', fontSize: '12px', gap: '4px' },
-  md: { height: '32px', padding: '0 16px', fontSize: '13px', gap: '6px' },
-  lg: { height: '36px', padding: '0 20px', fontSize: '14px', gap: '8px' },
+  sm: { height: '26px', padding: '0 10px', fontSize: '12px', gap: '4px' },
+  md: { height: '30px', padding: '0 14px', fontSize: '13px', gap: '6px' },
+  lg: { height: '34px', padding: '0 18px', fontSize: '14px', gap: '8px' },
 };
 
 export const Button: React.FC<ButtonProps> = ({

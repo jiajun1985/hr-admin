@@ -2,7 +2,6 @@ import type React from 'react';
 
 export const panelSurfaceStyle: React.CSSProperties = {
   backgroundColor: 'var(--gray-0)',
-  border: '1px solid var(--gray-200)',
   borderRadius: 'var(--radius-md)',
   boxShadow: 'var(--shadow-card)',
 };

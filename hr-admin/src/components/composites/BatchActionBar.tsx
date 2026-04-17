@@ -35,7 +35,7 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 16px',
+    padding: '10px 14px',
     backgroundColor: 'var(--primary-50)',
     border: '1px solid var(--primary-200)',
     borderRadius: 'var(--radius-md)',
@@ -46,13 +46,13 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
   const leftSectionStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: '12px',
   };
 
   const countStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '6px',
     fontSize: '13px',
     color: 'var(--gray-600)',
   };
@@ -66,7 +66,7 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
-    padding: '4px 8px',
+    padding: '3px 7px',
     backgroundColor: 'transparent',
     border: 'none',
     color: 'var(--gray-500)',
@@ -94,7 +94,7 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '8px 12px',
+    padding: '7px 10px',
     fontSize: '13px',
     color: 'var(--gray-600)',
     borderBottom: '1px solid var(--gray-100)',
@@ -104,8 +104,8 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '18px',
-    height: '18px',
+    width: '16px',
+    height: '16px',
     backgroundColor: 'transparent',
     border: 'none',
     color: 'var(--gray-400)',
@@ -116,7 +116,7 @@ export const BatchActionBar: React.FC<BatchActionBarProps> = ({
   const actionsStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '6px',
   };
 
   const selectedKeys = selectedItems.map((item) => item.key);
