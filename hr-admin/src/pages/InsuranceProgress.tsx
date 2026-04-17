@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ListPageTemplate } from '../components/composites/ListPageTemplate';
+import type { Filter } from '../components/composites/FilterBar';
 import { type TableColumn } from '../components/composites/DataTable';
 import { Button } from '../components/basics/Button';
 import { Tag } from '../components/basics/Tag';
 import { Modal } from '../components/basics/Modal';
-import { Select } from '../components/basics/Select';
 import { useLocalStorageState } from '../hooks/useLocalStorageState';
 import { DEMO_STORAGE_KEYS, seedInsuranceProgress } from '../mockApi/demoData';
 
@@ -176,40 +176,30 @@ const InsuranceProgress: React.FC = () => {
     },
   ];
 
-  const filters = [
+  const filters: Filter[] = [
     {
       key: 'insurancePlan',
       label: '保险方案',
-      component: (
-        <Select
-          placeholder="全部方案"
-          value={planFilter}
-          onChange={handlePlanFilterChange}
-          options={[
-            { label: '补充医疗保险', value: '补充医疗保险' },
-            { label: '团体意外险', value: '团体意外险' },
-            { label: '重大疾病险', value: '重大疾病险' },
-          ]}
-        />
-      ),
+      type: 'select',
+      placeholder: '全部方案',
+      options: [
+        { label: '补充医疗保险', value: '补充医疗保险' },
+        { label: '团体意外险', value: '团体意外险' },
+        { label: '重大疾病险', value: '重大疾病险' },
+      ],
     },
     {
       key: 'status',
       label: '投保状态',
-      component: (
-        <Select
-          placeholder="全部状态"
-          value={statusFilter}
-          onChange={handleStatusFilterChange}
-          options={[
-            { label: '待提交', value: 'pending' },
-            { label: '待确认', value: 'submitting' },
-            { label: '承保中', value: 'underwriting' },
-            { label: '已承保', value: 'insured' },
-            { label: '已拒绝', value: 'rejected' },
-          ]}
-        />
-      ),
+      type: 'select',
+      placeholder: '全部状态',
+      options: [
+        { label: '待提交', value: 'pending' },
+        { label: '待确认', value: 'submitting' },
+        { label: '承保中', value: 'underwriting' },
+        { label: '已承保', value: 'insured' },
+        { label: '已拒绝', value: 'rejected' },
+      ],
     },
   ];
 
@@ -254,6 +244,10 @@ const InsuranceProgress: React.FC = () => {
         dataSource={filteredData}
         rowKey="id"
         filters={filters}
+        onFilterChange={(key, value) => {
+          if (key === 'insurancePlan') handlePlanFilterChange(value);
+          if (key === 'status') handleStatusFilterChange(value);
+        }}
         pagination={{
           current: 1,
           pageSize: 20,

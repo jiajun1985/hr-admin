@@ -51,6 +51,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const [internalSearchValue, setInternalSearchValue] = React.useState('');
 
   const searchValue = externalSearchValue !== undefined ? externalSearchValue : internalSearchValue;
+  const controlWidth = '240px';
 
   const containerStyle: React.CSSProperties = {
     backgroundColor: 'var(--gray-0)',
@@ -141,7 +142,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
             contentColor="var(--gray-500)"
-            style={{ width: '248px' }}
+            style={{ width: controlWidth }}
           />
 
           {filters.map((filter) => (
@@ -153,7 +154,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   value={filterValues[filter.key]}
                   onChange={(value) => onFilterChange?.(filter.key, value)}
                   placeholder={filter.placeholder || (hideLabels ? filter.label : '全部')}
-                  style={{ width: '128px' }}
+                  style={{ width: controlWidth }}
                   contentColor="var(--gray-500)"
                 />
               )}
@@ -162,7 +163,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   placeholder={filter.placeholder || (hideLabels ? filter.label : undefined)}
                   value={filterValues[filter.key] as string}
                   onChange={(e) => onFilterChange?.(filter.key, e.target.value)}
-                  style={{ width: '128px' }}
+                  style={{ width: controlWidth }}
                   contentColor="var(--gray-500)"
                 />
               )}

@@ -87,7 +87,7 @@ export function ListPageTemplate<T extends Record<string, any>>({
   loading = false,
   emptyText = '暂无数据',
   tableLayoutMode = 'fixed',
-  hideFilterLabels = false,
+  hideFilterLabels = true,
   onSearch,
   onFilterChange,
   onReset,
