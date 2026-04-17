@@ -1,5 +1,5 @@
 import React from 'react';
-import { chartPanelBorder, chartPanelShadow } from './theme';
+import { chartPanelShadow } from './theme';
 import type { ChartSummaryItem } from './types';
 
 interface ChartCardProps {
@@ -25,7 +25,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
     <div
       style={{
         backgroundColor: 'var(--gray-0)',
-        border: chartPanelBorder,
+        border: 'none',
         borderRadius: '8px',
         boxShadow: chartPanelShadow,
         padding: '22px',
@@ -59,13 +59,12 @@ export const ChartCard: React.FC<ChartCardProps> = ({
           style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${Math.min(summary.length, 3)}, minmax(0, 1fr))`,
-            borderTop: '1px solid var(--gray-100)',
-            borderBottom: '1px solid var(--gray-100)',
             margin: '0 0 14px',
             padding: '10px 0',
+            gap: '12px',
           }}
         >
-          {summary.map((item, index) => (
+          {summary.map((item) => (
             <span
               key={item.label}
               style={{
@@ -75,8 +74,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
                 fontSize: '12px',
                 color: 'var(--gray-500)',
                 minWidth: 0,
-                padding: index === 0 ? '0 12px 0 0' : '0 12px',
-                borderLeft: index === 0 ? undefined : '1px solid var(--gray-100)',
+                padding: '0',
               }}
             >
               <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>

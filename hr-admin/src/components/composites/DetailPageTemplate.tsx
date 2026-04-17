@@ -64,7 +64,6 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
 
   const headerStyle: React.CSSProperties = {
     padding: '20px',
-    borderBottom: '1px solid var(--gray-200)',
   };
 
   const breadcrumbStyle: React.CSSProperties = {
@@ -99,7 +98,6 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
 
   const tabsStyle: React.CSSProperties = {
     display: 'flex',
-    borderBottom: '1px solid var(--gray-200)',
     padding: '0 20px',
   };
 
@@ -110,8 +108,7 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
     padding: '12px 16px',
     fontSize: '14px',
     color: isActive ? 'var(--primary-600)' : isDisabled ? 'var(--gray-300)' : 'var(--gray-500)',
-    borderBottom: isActive ? '2px solid var(--primary-600)' : '2px solid transparent',
-    marginBottom: '-1px',
+    borderBottom: 'none',
     cursor: isDisabled ? 'not-allowed' : 'pointer',
     transition: 'all 0.15s',
     fontWeight: isActive ? 500 : 400,
@@ -137,7 +134,6 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
 
   const leftStyle: React.CSSProperties = {
     width: typeof leftWidth === 'number' ? `${leftWidth}px` : leftWidth,
-    borderRight: '1px solid var(--gray-200)',
     padding: '20px',
     flexShrink: 0,
   };
@@ -159,7 +155,7 @@ export const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
     marginTop: '4px',
     minWidth: '160px',
     backgroundColor: 'var(--gray-0)',
-    border: '1px solid var(--gray-200)',
+    border: 'none',
     borderRadius: 'var(--radius-md)',
     boxShadow: 'var(--shadow-lg)',
     padding: '4px',

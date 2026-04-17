@@ -33,7 +33,7 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({
           padding: '40px',
           textAlign: 'center',
           color: 'var(--gray-400)',
-          border: '1px dashed var(--gray-200)',
+          border: 'none',
         }}
       >
         <div style={{ marginBottom: '16px' }}>

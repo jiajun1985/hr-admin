@@ -10,7 +10,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  companyName = 'FAFULI',
+  companyName = 'FAFULI-HR 管理后台',
   userName = '管理员',
   userAvatar,
   onLogout,
@@ -47,7 +47,9 @@ export const Header: React.FC<HeaderProps> = ({
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    width: '200px',
+    width: 'auto',
+    minWidth: '200px',
+    flexShrink: 0,
   };
 
   const logoTextStyle: React.CSSProperties = {
@@ -55,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
     fontWeight: 700,
     color: 'var(--primary-600)',
     letterSpacing: '1px',
+    whiteSpace: 'nowrap',
   };
 
   const rightSectionStyle: React.CSSProperties = {

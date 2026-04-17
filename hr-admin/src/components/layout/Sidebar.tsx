@@ -11,8 +11,6 @@ export interface MenuItem {
 }
 
 interface SidebarProps {
-  collapsed?: boolean;
-  onCollapse?: (collapsed: boolean) => void;
   activeKey?: string;
 }
 
@@ -144,8 +142,6 @@ const menuData: MenuItem[] = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  collapsed = false,
-  onCollapse,
   activeKey = 'dashboard-home',
 }) => {
   const navigate = useNavigate();
@@ -163,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     top: 'var(--header-height)',
     left: 0,
     bottom: 0,
-    width: collapsed ? 'var(--sidebar-collapsed-width)' : 'var(--sidebar-width)',
+    width: 'var(--sidebar-width)',
     backgroundColor: 'var(--gray-0)',
     borderRight: '1px solid var(--gray-200)',
     display: 'flex',
@@ -222,24 +218,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     overflow: 'hidden',
   });
 
-  const collapseButtonStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '48px',
-    borderTop: '1px solid var(--gray-200)',
-    cursor: 'pointer',
-    color: 'var(--gray-400)',
-    backgroundColor: 'transparent',
-    border: 'none',
-    transition: 'all 0.15s',
-  };
-
   const renderMenuItem = (item: MenuItem, level: number = 0): React.ReactNode => {
     if (item.type === 'group') {
       return (
         <div key={item.key}>
-          {!collapsed && <div style={groupHeaderStyle}>{item.label}</div>}
+          <div style={groupHeaderStyle}>{item.label}</div>
           {item.children?.map((child) => renderMenuItem(child, level))}
         </div>
       );
@@ -265,18 +248,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onMouseLeave={() => setHoveredKey(null)}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, overflow: 'hidden' }}>
-            {item.icon && !collapsed && (
+            {item.icon && (
               <Icon
                 name={item.icon}
                 size={level === 0 ? 16 : 14}
                 color={isActive ? 'var(--primary-600)' : isHovered ? 'var(--gray-700)' : 'var(--gray-400)'}
               />
             )}
-            {!collapsed && (
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
-            )}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
           </div>
-          {hasChildren && !collapsed && (
+          {hasChildren && (
             <Icon
               name="chevron-right"
               size={14}
@@ -288,7 +269,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           )}
         </div>
-        {hasChildren && isExpanded && !collapsed && (
+        {hasChildren && isExpanded && (
           <div style={subMenuStyle(level)}>
             {item.children!.map((child) => renderMenuItem(child, level + 1))}
           </div>
@@ -302,23 +283,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div style={menuContainerStyle}>
         {menuData.map((item) => renderMenuItem(item))}
       </div>
-      <button
-        style={collapseButtonStyle}
-        onClick={() => onCollapse?.(!collapsed)}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--gray-50)';
-          e.currentTarget.style.color = 'var(--gray-600)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-          e.currentTarget.style.color = 'var(--gray-400)';
-        }}
-      >
-        <Icon
-          name={collapsed ? 'chevron-right' : 'chevron-left'}
-          size={16}
-        />
-      </button>
     </aside>
   );
 };

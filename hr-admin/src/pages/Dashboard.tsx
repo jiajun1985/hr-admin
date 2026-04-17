@@ -454,8 +454,8 @@ const todoItemStyle: React.CSSProperties = {
   gap: '12px',
   width: '100%',
   padding: '12px',
-  border: '1px solid var(--gray-100)',
   borderRadius: 'var(--radius-md)',
+  border: 'none',
   backgroundColor: 'var(--gray-0)',
   cursor: 'pointer',
 };
@@ -511,17 +511,17 @@ function QuickAction({
 }) {
   return (
     <button
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '16px',
-        border: '1px solid var(--gray-100)',
-        borderRadius: 'var(--radius-md)',
-        backgroundColor: 'var(--gray-0)',
-        cursor: 'pointer',
-        textAlign: 'left',
-      }}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      padding: '16px',
+      borderRadius: 'var(--radius-md)',
+      border: 'none',
+      backgroundColor: 'var(--gray-0)',
+      cursor: 'pointer',
+      textAlign: 'left',
+    }}
       onClick={onClick}
     >
       <span

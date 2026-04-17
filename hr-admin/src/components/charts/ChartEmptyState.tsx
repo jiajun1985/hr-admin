@@ -18,7 +18,7 @@ export const ChartEmptyState: React.FC<ChartEmptyStateProps> = ({
         gap: '8px',
         alignItems: 'center',
         justifyContent: 'center',
-        border: '1px solid var(--gray-100)',
+        border: 'none',
         borderRadius: '8px',
         color: 'var(--gray-400)',
         fontSize: '13px',
