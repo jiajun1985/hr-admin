@@ -11,16 +11,17 @@ import { DEMO_STORAGE_KEYS, seedInsurancePlans } from '../mockApi/demoData';
 interface InsurancePlan {
   id: string;
   name: string;
+  insuranceType: string;
   policyNo: string;
   startDate: string;
   endDate: string;
   payRule: string;
   scope: string;
   coreBenefits: string[];
-  price: number;
-  priceUnit: string;
   employeeCount: number;
-  dependentCount: number;
+  childCount: number;
+  spouseCount: number;
+  parentCount: number;
   status: 'active' | 'pending' | 'expired';
 }
 
@@ -36,14 +37,12 @@ const InsurancePlanPage: React.FC = () => {
     const activePlans = insurancePlans.filter((plan) => plan.status === 'active');
     const pendingPlans = insurancePlans.filter((plan) => plan.status === 'pending');
     const expiredPlans = insurancePlans.filter((plan) => plan.status === 'expired');
-    const insuredEmployees = activePlans.reduce((sum, plan) => sum + plan.employeeCount, 0);
-    const dependents = activePlans.reduce((sum, plan) => sum + plan.dependentCount, 0);
-    const premium = insurancePlans.reduce((sum, plan) => sum + plan.price, 0);
+    const insuranceTypes = new Set(insurancePlans.map((plan) => plan.insuranceType));
     return [
       { title: '生效方案', value: String(activePlans.length), subText: '当前有效' },
-      { title: '投保人数', value: String(insuredEmployees + dependents), subText: `员工 ${insuredEmployees} + 家属 ${dependents}` },
+      { title: '保险类型', value: String(insuranceTypes.size), subText: Array.from(insuranceTypes).slice(0, 3).join(' / ') },
+      { title: '员工覆盖', value: String(activePlans.reduce((sum, plan) => sum + plan.employeeCount, 0)), subText: '当前有效方案合计' },
       { title: '待生效/到期', value: `${pendingPlans.length}/${expiredPlans.length}`, subText: '待生效 / 已到期' },
-      { title: '年度保费', value: `¥${premium.toLocaleString()}`, subText: '按方案报价汇总' },
     ];
   }, [insurancePlans]);
 
@@ -131,7 +130,6 @@ const InsurancePlanPage: React.FC = () => {
       <div style={cardGridStyle}>
         {filteredPlans.map((plan) => {
           const statusConfig = getStatusConfig(plan.status);
-          const insuredTotal = plan.employeeCount + plan.dependentCount;
           return (
             <div
               key={plan.id}
@@ -151,8 +149,13 @@ const InsurancePlanPage: React.FC = () => {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--gray-800)' }}>{plan.name}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--gray-800)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {plan.name}
+                  </div>
+                  <Tag color="info">{plan.insuranceType}</Tag>
+                </div>
                 <Tag color={statusConfig.color}>{statusConfig.label}</Tag>
               </div>
 
@@ -167,29 +170,31 @@ const InsurancePlanPage: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '2px' }}>付费规则</div>
-                    <div style={{ fontSize: '13px', color: 'var(--gray-700)' }}>{plan.payRule}</div>
-                  </div>
-                  <div>
                     <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '2px' }}>适用范围</div>
                     <div style={{ fontSize: '13px', color: 'var(--gray-700)' }}>{plan.scope}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '2px' }}>售价</div>
-                    <div style={{ fontSize: '13px', color: 'var(--gray-700)' }}>
-                      ¥{plan.price.toLocaleString()} 元/{plan.priceUnit}
-                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginBottom: '2px' }}>付费规则</div>
+                    <div style={{ fontSize: '13px', color: 'var(--gray-700)' }}>{plan.payRule}</div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '110px' }}>
-                  <div style={{ textAlign: 'center', padding: '14px', backgroundColor: 'var(--primary-50)', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--primary-600)' }}>{insuredTotal.toLocaleString()}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--primary-500)', marginTop: '4px' }}>保障人数</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', minWidth: '240px' }}>
+                  <div style={{ padding: '12px 14px', backgroundColor: 'var(--primary-50)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--primary-500)', marginBottom: '4px' }}>员工</div>
+                    <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--primary-600)' }}>{plan.employeeCount}</div>
                   </div>
-                  <div style={{ textAlign: 'center', padding: '14px', backgroundColor: 'var(--gray-50)', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--gray-700)' }}>员工 {plan.employeeCount}</div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--gray-500)', marginTop: '4px' }}>家属 {plan.dependentCount}</div>
+                  <div style={{ padding: '12px 14px', backgroundColor: 'var(--gray-50)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--gray-500)', marginBottom: '4px' }}>子女</div>
+                    <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--gray-700)' }}>{plan.childCount}</div>
+                  </div>
+                  <div style={{ padding: '12px 14px', backgroundColor: 'var(--info-50)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--info-600)', marginBottom: '4px' }}>配偶</div>
+                    <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--info-600)' }}>{plan.spouseCount}</div>
+                  </div>
+                  <div style={{ padding: '12px 14px', backgroundColor: 'var(--warning-50)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--warning-600)', marginBottom: '4px' }}>父母</div>
+                    <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--warning-600)' }}>{plan.parentCount}</div>
                   </div>
                 </div>
               </div>

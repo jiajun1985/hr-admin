@@ -50,6 +50,7 @@ interface InsuranceMaterial {
 
 const schemeInfo = {
   name: '企业补充医疗保险计划A',
+  insuranceType: '补充医疗保险',
   policyNo: 'SI-2026-XXXXX',
   company: '平安健康保险股份有限公司',
   startDate: '2026-01-01',
@@ -57,13 +58,15 @@ const schemeInfo = {
   premium: 128000,
   perCapitaCoverage: 30000,
   employeeCount: 20,
-  dependentCount: 5,
+  childCount: 2,
+  spouseCount: 2,
+  parentCount: 1,
   benefits: [
     '门急诊医疗：80% 赔付，上限 5000 元/年',
     '住院医疗：100% 赔付，上限 3 万元/年',
     '重大疾病：10 万元一次性给付',
     '意外伤害：5 万元给付',
-    '员工家属可附带投保（保费员工自付）',
+    '员工可附带子女、配偶及父母投保（费用按对象分摊）',
   ],
   remark: '本方案适用于全体正式员工，含试用期转正人员',
 };
@@ -278,13 +281,26 @@ const InsuranceSchemeDetail: React.FC = () => {
           <div style={panelTitleStyle}>方案概览</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px 24px', marginBottom: '16px' }}>
             <InfoRow label="保险方案" value={`${schemeInfo.name} (基础版)`} />
+            <InfoRow label="保险类型" value={schemeInfo.insuranceType} />
             <InfoRow label="保单号码" value={schemeInfo.policyNo} />
             <InfoRow label="保险公司" value={schemeInfo.company} />
             <InfoRow label="生效日期" value={schemeInfo.startDate} />
             <InfoRow label="终止日期" value={schemeInfo.endDate} />
-            <InfoRow label="投保人数" value={`${persons.filter((p) => p.status !== '已失效').length} 人`} />
             <InfoRow label="人均保额" value={`${schemeInfo.perCapitaCoverage.toLocaleString()} 元/年`} />
             <InfoRow label="企业保费" value={`¥${schemeInfo.premium.toLocaleString()}/年`} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px', marginBottom: '16px' }}>
+            {[
+              { label: '员工', value: schemeInfo.employeeCount, color: 'var(--primary-600)', bg: 'var(--primary-50)' },
+              { label: '子女', value: schemeInfo.childCount, color: 'var(--gray-700)', bg: 'var(--gray-50)' },
+              { label: '配偶', value: schemeInfo.spouseCount, color: 'var(--info-600)', bg: 'var(--info-50)' },
+              { label: '父母', value: schemeInfo.parentCount, color: 'var(--warning-600)', bg: 'var(--warning-50)' },
+            ].map((item) => (
+              <div key={item.label} style={{ padding: '12px 14px', backgroundColor: item.bg, borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '13px', color: item.color, marginBottom: '4px' }}>{item.label}</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: item.color }}>{item.value}</div>
+              </div>
+            ))}
           </div>
           <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--gray-100)' }}>
             <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--gray-700)', marginBottom: '8px' }}>保障内容</div>

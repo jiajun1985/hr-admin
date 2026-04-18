@@ -167,7 +167,7 @@ const InsuranceData: React.FC = () => {
 
   const productDistribution = useMemo(() => plans.map((plan) => ({
     name: plan.name,
-    value: plan.employeeCount + plan.dependentCount,
+    value: plan.employeeCount + plan.childCount + plan.spouseCount + plan.parentCount,
   })), [plans]);
 
   const radarData = [

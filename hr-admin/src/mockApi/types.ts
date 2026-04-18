@@ -35,6 +35,7 @@ export interface Department {
 export interface InsurancePlan {
   id: string;
   name: string;
+  insuranceType: string;
   policyNo: string;
   startDate: string;
   endDate: string;
@@ -44,7 +45,9 @@ export interface InsurancePlan {
   price: number;
   priceUnit: string;
   employeeCount: number;
-  dependentCount: number;
+  childCount: number;
+  spouseCount: number;
+  parentCount: number;
   status: 'active' | 'pending' | 'expired';
 }
 
